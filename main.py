@@ -105,6 +105,11 @@ from main_helpers import (is_correct_event,
 LIVETIMING_SESSION_URL = (
     'https://www.livetiming.se/program.php?cid=8051&session=1')
 
+'''
+Number of heats per event to get the best swim splits for. Set to 1 or above.
+'''
+NUM_HEATS = 2
+
 
 
 DEBUG = True
@@ -425,6 +430,7 @@ def get_best_swims_for_event(event_heat_list_url: str) -> tuple[str, dict]:
     event_trs = event_soup.find_all('tr')
     event_name = None
     pool = None
+    total_heats = None
     curr_heat = None
     curr_heat_rows = []
     event_best_swims = dict()
@@ -435,22 +441,26 @@ def get_best_swims_for_event(event_heat_list_url: str) -> tuple[str, dict]:
             pool = row_text[9:12]
         if row_text[:5] == 'Gren ':
             # new heat
-            heat = row_text.split(' ')[-2]
+            row_tokens = row_text.split(' ')
+            heat = row_tokens[-2]
             if event_name is None:
-                event_name = ' '.join(row_text.split(' ')[2:5])
-            if curr_heat is not None:
+                event_name = ' '.join(row_tokens[2:5])
+            if total_heats is None:
+                total_heats = int(row_tokens[-1].replace('(', '')
+                                                .replace(')', ''))
+            if (curr_heat is not None and 
+                int(curr_heat) > total_heats - NUM_HEATS):
                 # get best swims for the previous heat
-                assert(pool is not None)
                 heat_best_swims = get_best_swims_for_heat(curr_heat_rows, 
                                                           event_name, pool)
-                curr_heat_rows = []
                 event_best_swims[curr_heat] = heat_best_swims
+            if curr_heat is not None:
+                curr_heat_rows = []
             curr_heat = heat
             continue
         if curr_heat is not None:
             curr_heat_rows.append(row)
     # get best swims for the last heat
-    assert(pool is not None)
     heat_best_swims = get_best_swims_for_heat(curr_heat_rows, event_name, 
                                               pool)
     event_best_swims[curr_heat] = heat_best_swims
