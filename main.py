@@ -1,29 +1,77 @@
 '''
 Main call chain:
 
-get_best_swims_for_session (called 1 time)
- |
+get_best_swims_for_session
+ |  called:    1 time
+ |  cached:    no
+ |  request:   GET to LiveTiming
+ |  iterates:  through the events in the session
  V
-get_best_swims_for_event (called #events_in_session times)
- |
+get_best_swims_for_event
+ |  called:    num. events_in_session times
+ |  cached:    no
+ |  request:   GET to LiveTiming    
+ |  iterates:  through the heats in the event
  V
-get_best_swims_for_heat (called #heats_in_event times)
- |  
+get_best_swims_for_heat
+ |  called:    num. heats_in_event times
+ |  cached:    no
+ |  request:   none
+ |  iterates:  through the swimmers in the heat
  V
-get_best_swim_for_swimmer (called #swimmers_in_heat times)
+get_best_swim_for_swimmer
+ |  |  called:    num. swimmers_in_heat times
+ |  |  cached:    no
+ |  |  request:   none
+ |  |  iterates:  no
  |  |
- |  +--> get_swimmer_id [cached] (called 1 time)
- |  +--> get_event_id [immediate access] (called 1 time)
- |  +--> get_meet_name_and_date (called 1 time)
- |  +--> get_meet_id_and_location [cached] (called 1 time)
+ |  +--> get_swimmer_id 
+ |  |      called:    1 time
+ |  |      cached:    yes
+ |  |      request:   GET to Tempus
+ |  |      iterates:  no
+ |  |
+ |  +--> get_event_id
+ |  |      called:    1 time
+ |  |      cached:    no
+ |  |      request:   none
+ |  |      iterates:  no
+ |  |
+ |  +--> get_meet_name_and_date
+ |  |      called:    1 time
+ |  |      cached:    no
+ |  |      request:   GET to Tempus
+ |  |      iterates:  no
+ |  |
+ |  +--> get_meet_id_and_location
+ |         called:    1 time
+ |         cached:    yes
+ |         request:   GET to LiveTiming
+ |         iterates:  through all meets in LiveTiming
  V
-get_splits_from_meet (called 1 time)
- |  
+get_splits_from_meet
+ |  |  called:    1 time
+ |  |  cached:    no
+ |  |  request:   none
+ |  |  iterates:  through all results of the meet
+ |  |
+ |  +--> get_meet_results
+ |         called:    1 time
+ |         cached:    yes
+ |         request:   GET to LiveTiming
+ |         iterates:  no
  V
-get_splits_from_event_edition (called #matching_event_editions_in_meet times)
- |  
+get_splits_from_event_edition
+ |  called:    num. matching_event_editions_in_meet times
+ |  cached:    no
+ |  request:   none
+ |  iterates:  through all swims in the event edition
  V
-get_splits_from_swim (called #matching_swims_in_event_edition times)
+get_splits_from_swim
+    called:    num. matching_swims_in_event_edition times
+    cached:    no
+    request:   none
+    iterates:  through the row texts of a swim and the splits on that row
 '''
 
 
@@ -74,7 +122,7 @@ def time_function(func, *args):
 
 
 ######################################################################
-# Helpers for get_best_swim_for_swimmer
+# Helper functions for get_best_swim_for_swimmer
 ######################################################################
 
 def get_swimmer_id(swimmer_data: dict[str, str]) -> str | None:
@@ -174,13 +222,40 @@ def get_meet_id_and_location(name: str) -> tuple[str, str] | tuple[None, None]:
     return None, None
 
 ######################################################################
+# Helper function for get_splits_from_meet
+######################################################################
+
+def get_meet_results(meet_id: str) -> list[str]:
+    '''
+    Returns the table row texts of the results of a meet. If the meet is in the
+    cache, its results are returned immediately. Otherwise, a GET request is
+    made to LiveTiming to get the meet results. The results are then added to
+    the cache.
+    '''
+    cached_results = get_cached_meet_results(meet_id)
+    if cached_results is not None:
+        debug_print('Used cached meet results.')
+        return cached_results
+    debug_print('Making GET request to LiveTiming for meet results.')
+    meet_results_url = (f'https://www.livetiming.se/results.php?'
+                        f'cid={meet_id}&session=0&all=1')
+    meet_results_page = requests.get(meet_results_url)
+    meet_results_soup = BeautifulSoup(meet_results_page.content, 'html.parser')
+    meet_results_trs = meet_results_soup.find_all('tr')
+    meet_results_row_texts = [get_element_text(row) 
+                              for row in meet_results_trs
+                              if get_element_text(row) != '']
+    add_meet_results_to_cache(meet_id, meet_results_row_texts)
+    return meet_results_row_texts
+
+######################################################################
 # Main call chain (reversed)
 ######################################################################
 
-def get_splits_from_swim(swim_rows: list) -> dict[str, str]:
+def get_splits_from_swim(swim_row_texts: list[str]) -> dict[str, str]:
     '''
-    Iterates through the rows of a swim and and the splits on that row. Returns
-    the splits for the given swim in a dictionary which looks like:
+    Iterates through the row texts of a swim and the splits on that row. 
+    Returns the splits for the given swim in a dictionary which looks like:
         {
             '50m': 'time',
             '100m': 'time (last 50 time)',
@@ -191,8 +266,7 @@ def get_splits_from_swim(swim_rows: list) -> dict[str, str]:
     Called for each matching swim by get_splits_from_event_edition.
     '''
     splits = dict()
-    for row in swim_rows:
-        row_text = get_element_text(row)
+    for row_text in swim_row_texts:
         row_tokens = row_text.split(' ')
         i = 0
         while i < len(row_tokens)-1:
@@ -208,7 +282,7 @@ def get_splits_from_swim(swim_rows: list) -> dict[str, str]:
     return splits
 
 def get_splits_from_event_edition(event_name: str,
-                                  event_edition_rows: list, 
+                                  event_edition_row_texts: list[str], 
                                   swimmer_data: dict[str, str]
                                   ) -> dict[str, str] | None:
     '''
@@ -217,10 +291,9 @@ def get_splits_from_event_edition(event_name: str,
     Called for each matching event edition by get_splits_from_meet.
     '''
     is_fifty_event = '50m ' in event_name
-    swim_rows = []
+    swim_row_texts = []
     in_correct_swim = False
-    for row in event_edition_rows:
-        row_text = get_element_text(row)
+    for row_text in event_edition_row_texts:
         if row_text == '': continue
         row_tokens = row_text.split(' ')
         if (f'{row_tokens[1]} {row_tokens[2]}' == swimmer_data['name']
@@ -231,34 +304,31 @@ def get_splits_from_event_edition(event_name: str,
             continue
         if in_correct_swim and row_tokens[0].isdigit():
             in_correct_swim = False
-            if swim_rows != []:
-                return get_splits_from_swim(swim_rows)
+            if swim_row_texts != []:
+                return get_splits_from_swim(swim_row_texts)
             continue
         if in_correct_swim:
-            swim_rows.append(row)
+            swim_row_texts.append(row_text)
     return None
 
 def get_splits_from_meet(meet_id: str, swimmer_data: dict[str, str], 
                          event_name: str) -> dict[str, str] | None:
     '''
-    Iterates through the events in the results of a meet and gets the splits
-    for the swimmer in the given event. If the swimmer swam the event multiple 
-    times, only the splits of the fastest swim are  returned. Returns None if 
-    the event is not found. Makes a GET request to LiveTiming. Called once by 
-    get_best_swim_for_swimmer.
+    Returns the splits for the swimmer in the given event at the given meet.
+    If the meet is in the cache, no GET request is made. Otherwise, a GET
+    request is made to LiveTiming to get the meet results.
+
+    If the swimmer swam the event multiple times, only the splits of the 
+    fastest swim are returned. Returns None if the event is not found. 
+    
+    Called once by get_best_swim_for_swimmer.
     '''
-    # CAN CACHE HERE
-    meet_results_url = (
-        f'https://www.livetiming.se/results.php?cid={meet_id}&session=0&all=1')
-    meet_results_page = requests.get(meet_results_url)
-    meet_results_soup = BeautifulSoup(meet_results_page.content, 'html.parser')
-    meet_results_trs = meet_results_soup.find_all('tr')
+    meet_results_row_texts = get_meet_results(meet_id)
     all_splits = []
-    curr_event_edition_rows = []
+    curr_event_edition_row_texts = []
     in_correct_event = False
     in_swimmer_rows = False
-    for row in meet_results_trs:
-        row_text = get_element_text(row)
+    for row_text in meet_results_row_texts:
         if row_text == '': continue
         if row_text[:5] == 'Gren ' and is_correct_event(row_text, event_name):
             in_correct_event = True
@@ -270,25 +340,18 @@ def get_splits_from_meet(meet_id: str, swimmer_data: dict[str, str],
             row_text[:17] == 'Grenen officiell:'):
             in_correct_event = False
             in_swimmer_rows = False
-            if curr_event_edition_rows != []:
+            if curr_event_edition_row_texts != []:
                 splits = get_splits_from_event_edition(event_name, 
-                                                       curr_event_edition_rows, 
-                                                       swimmer_data)
+                                                curr_event_edition_row_texts, 
+                                                swimmer_data)
                 all_splits.append(splits)
-                curr_event_edition_rows = []
+                curr_event_edition_row_texts = []
             continue
         if in_correct_event and in_swimmer_rows:
-            curr_event_edition_rows.append(row)
+            curr_event_edition_row_texts.append(row_text)
     if all_splits == []:
         return None
     return fastest_swim(all_splits)
-
-# print(get_splits_from_meet('7596', 
-#                            {'name': 'Melker Rosengren',
-#                             'born' : '2003',
-#                             'club' : 'Väsby Simsällskap'}, 
-#                            '100m Medley'))
-
 
 def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
                               pool: str) -> dict:
@@ -394,18 +457,18 @@ def get_best_swims_for_event(event_heat_list_url: str) -> tuple[str, dict]:
     return event_name, event_best_swims
         
 
-# load_stored_swimmer_id_cache()
-# load_stored_meet_id_and_location_cache()
-# load_stored_meet_results_cache()
+load_stored_swimmer_id_cache()
+load_stored_meet_id_and_location_cache()
+load_stored_meet_results_cache()
 
-# return_val = time_function(get_best_swims_for_event, 
-#                            'https://www.livetiming.se/program.php?cid=8051&session=1&type=HL&event=1&tpid=1')
-# pprint(return_val)
-# # pprint(get_best_swims_for_event('https://www.livetiming.se/program.php?cid=8051&session=1&type=HL&event=1&tpid=1'))
+return_val = time_function(get_best_swims_for_event, 
+                           'https://www.livetiming.se/program.php?cid=8051&session=1&type=HL&event=1&tpid=1')
+pprint(return_val)
+# pprint(get_best_swims_for_event('https://www.livetiming.se/program.php?cid=8051&session=1&type=HL&event=1&tpid=1'))
 
-# save_swimmer_id_cache()
-# save_meet_id_and_location_cache()
-# save_meet_results_cache()
+save_swimmer_id_cache()
+save_meet_id_and_location_cache()
+save_meet_results_cache()
 
 def get_best_swims_for_session(session_url: str) -> dict:
     '''

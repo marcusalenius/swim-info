@@ -1,6 +1,6 @@
 '''
 This file contains a cache for meet results. The keys are the IDs of the meets,
-and the values are lists of the table row text of the meet results.
+and the values are lists of the table row texts of the meet results.
 '''
 import json
 
@@ -32,8 +32,8 @@ def get_cached_meet_results(meet_id: str) -> list[str] | None:
     '''
     return meet_results_cache.get(meet_id)
 
-def add_meet_results_to_cache(meet_id: str, trs: list[str]) -> None:
+def add_meet_results_to_cache(meet_id: str, row_texts: list[str]) -> None:
     '''
     Adds the results of a meet to the cache.
     '''
-    meet_results_cache[meet_id] = trs
+    meet_results_cache[meet_id] = row_texts
