@@ -10,8 +10,8 @@ MEET_NAME_ABBREVIATIONS = {
     ('ungdoms', 'grand', 'prix') : 'ugp',
     ('långbana',) : '50',
     ('kortbana',) : '25',
-    ('bockstendsdoppet',) : 'bockstensdoppet' # misspelled in Tempus
-    
+    ('bockstendsdoppet',) : 'bockstensdoppet', # misspelled in Tempus
+    ('eriksdal',) : 'eriksdalsbadet'
 }
 
 MEET_NAME_REMOVABLE_TOKENS = {
@@ -19,7 +19,7 @@ MEET_NAME_REMOVABLE_TOKENS = {
     'ett', 'två', 'tre', 'fyra', 'bassäng', 'bassängen', 'simhall', 
     'simhallen', 'sim', 'simning', 'simningen', 'simtävling', 'simtävlingen',
     'arena', 'arenan', 'pool', 'poolen', 'bad', 'badet', 'badhus', 'badhuset',
-    'simarena', 'simarenan', 'simbassäng', 'simbassängen'
+    'simarena', 'simarenan', 'simbassäng', 'simbassängen', '&'
 }
 
 def clean_meet_name(name: str) -> str:

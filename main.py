@@ -487,22 +487,22 @@ def get_best_swims_for_event(event_heat_list_url: str) -> tuple[str, dict]:
     return event_name, event_best_swims
         
 
-load_stored_swimmer_id_cache()
-load_stored_meet_id_and_location_cache()
-load_stored_meet_results_cache()
+# load_stored_swimmer_id_cache()
+# load_stored_meet_id_and_location_cache()
+# load_stored_meet_results_cache()
 
-return_val = time_function(get_best_swims_for_event, 
-                           'https://www.livetiming.se/program.php?cid=8051&session=1&type=HL&event=1&tpid=1')
+# return_val = time_function(get_best_swims_for_event, 
+#                            'https://www.livetiming.se/program.php?cid=8051&session=1&type=HL&event=1&tpid=1')
 
-with open('output.json', 'w') as file:
-    json.dump(return_val[1], file, indent=4, sort_keys=True)
+# with open('output.json', 'w') as file:
+#     json.dump(return_val[1], file, indent=4, sort_keys=True)
 
-# pprint(return_val)
-# pprint(get_best_swims_for_event('https://www.livetiming.se/program.php?cid=8051&session=1&type=HL&event=1&tpid=1'))
+# # pprint(return_val)
+# # pprint(get_best_swims_for_event('https://www.livetiming.se/program.php?cid=8051&session=1&type=HL&event=1&tpid=1'))
 
-save_swimmer_id_cache()
-save_meet_id_and_location_cache()
-save_meet_results_cache()
+# save_swimmer_id_cache()
+# save_meet_id_and_location_cache()
+# save_meet_results_cache()
 
 def get_best_swims_for_session(session_url: str) -> dict:
     '''
@@ -531,11 +531,17 @@ def main():
     load_stored_swimmer_id_cache()
     load_stored_meet_id_and_location_cache()
     load_stored_meet_results_cache()
-    session_best_swims = get_best_swims_for_session(LIVETIMING_SESSION_URL)
+    # session_best_swims = get_best_swims_for_session(LIVETIMING_SESSION_URL)
+    session_best_swims = time_function(get_best_swims_for_session,
+                                       LIVETIMING_SESSION_URL)
     save_swimmer_id_cache()
     save_meet_id_and_location_cache()
     save_meet_results_cache()
 
+    with open('output.json', 'w') as file:
+        json.dump(session_best_swims, file, indent=4, sort_keys=True)
 
-# print(get_best_swims_for_session(LIVETIMING_SESSION_URL))
+
+if __name__ == '__main__':
+    main()
 
