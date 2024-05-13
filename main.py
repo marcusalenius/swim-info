@@ -195,7 +195,8 @@ def get_meet_name_and_date(swimmer_id: str, event_id: str) -> tuple[str, str]:
     date = get_element_text(first_row_tds[-2])
     return name, date
 
-def get_meet_id_and_location(name: str) -> tuple[str, str] | tuple[None, None]:
+def get_meet_id_and_location(name: str, 
+                             date:str) -> tuple[str, str] | tuple[None, None]:
     '''
     Returns the LiveTiming id and location of a meet by its name. 
 
@@ -218,7 +219,9 @@ def get_meet_id_and_location(name: str) -> tuple[str, str] | tuple[None, None]:
         row_tds = row.find_all('td')
         name_td = row_tds[0]
         meet_name = get_element_text(name_td)
-        if meet_names_match(name, meet_name):
+        date_td = row_tds[3]
+        meet_date = get_element_text(date_td)
+        if meet_names_match(name, date, meet_name, meet_date):
             link = name_td.find('a')['href']
             id = link.split('=')[-1]
             location_td = row_tds[1]
@@ -382,7 +385,7 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
     if event_id is None:
         return {'Error' : 'Error getting Tempus event id.'}
     meet_name, meet_date = get_meet_name_and_date(swimmer_id, event_id)
-    meet_id, meet_location = get_meet_id_and_location(meet_name)
+    meet_id, meet_location = get_meet_id_and_location(meet_name, meet_date)
     if meet_id is None or meet_location is None:
         return {'Error' : 'Error getting LiveTiming meet id and location. '
                           f'Meet name: {meet_name}.'}

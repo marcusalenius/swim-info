@@ -45,7 +45,7 @@ def make_abbreviations(tokens: set[str]) -> None:
             tokens -= key
             tokens.add(value)
 
-def meet_names_match(name1: str, name2: str) -> bool:
+def meet_names_match(name1: str, date1: str, name2: str, date2: str) -> bool:
     '''
     Returns True if the two meet names are similar enough to be considered the 
     same meet. This function is used to match a meet name from Tempus to a meet 
@@ -55,6 +55,8 @@ def meet_names_match(name1: str, name2: str) -> bool:
     if name1 == name2: return True
     name1, name2 = clean_meet_name(name1), clean_meet_name(name2)
     if name1 == name2: return True
+    year1, year2 = date1[:4], date2[:4]
+    if year1 != year2: return False
     name1_tokens = set(name1.split(' '))
     name2_tokens = set(name2.split(' '))
     # delete arbitrary tokens
@@ -62,6 +64,8 @@ def meet_names_match(name1: str, name2: str) -> bool:
     name2_tokens -= MEET_NAME_REMOVABLE_TOKENS
     make_abbreviations(name1_tokens)
     make_abbreviations(name2_tokens)
-    # print(name1_tokens, name2_tokens)
+    # make sure both sets contain the year
+    name1_tokens |= {year1}
+    name2_tokens |= {year2}
     return name1_tokens == name2_tokens 
 
