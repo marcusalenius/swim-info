@@ -82,6 +82,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import quote
 
 from pprint import pprint 
+import json
 
 from utilities import get_element_text
 from meet_matcher import meet_names_match
@@ -383,7 +384,8 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
     meet_name, meet_date = get_meet_name_and_date(swimmer_id, event_id)
     meet_id, meet_location = get_meet_id_and_location(meet_name)
     if meet_id is None or meet_location is None:
-        return {'Error' : 'Error getting LiveTiming meet id and location.'}
+        return {'Error' : 'Error getting LiveTiming meet id and location. '
+                          f'Meet name: {meet_name}.'}
     splits = get_splits_from_meet(meet_id, swimmer_data, event_name)
     if splits is None:
         return {'Error' : 'Error getting splits from LiveTiming.'}
@@ -415,7 +417,7 @@ def get_best_swims_for_heat(heat_rows: list, event_name: str,
         swimmer_data['name'] = get_element_text(tds[3])
         swimmer_data['born'] = get_element_text(tds[4])
         swimmer_data['club'] = get_element_text(tds[5])
-        heat_best_swims[(lane, swimmer_data['name'])] = (
+        heat_best_swims[f'({lane}, {swimmer_data["name"]})'] = (
             get_best_swim_for_swimmer(swimmer_data, event_name, pool))
     return heat_best_swims
 
@@ -473,7 +475,11 @@ load_stored_meet_results_cache()
 
 return_val = time_function(get_best_swims_for_event, 
                            'https://www.livetiming.se/program.php?cid=8051&session=1&type=HL&event=1&tpid=1')
-pprint(return_val)
+
+with open('output.json', 'w') as file:
+    json.dump(return_val[1], file, indent=4, sort_keys=True)
+
+# pprint(return_val)
 # pprint(get_best_swims_for_event('https://www.livetiming.se/program.php?cid=8051&session=1&type=HL&event=1&tpid=1'))
 
 save_swimmer_id_cache()

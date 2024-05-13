@@ -7,7 +7,11 @@ from utilities import collapse_whitespace
 
 MEET_NAME_ABBREVIATIONS = {
     ('ungdoms', 'gp') : 'ugp',
-    ('ungdoms', 'grand', 'prix') : 'ugp'
+    ('ungdoms', 'grand', 'prix') : 'ugp',
+    ('långbana',) : '50',
+    ('kortbana',) : '25',
+    ('bockstendsdoppet',) : 'bockstensdoppet' # misspelled in Tempus
+    
 }
 
 MEET_NAME_REMOVABLE_TOKENS = {
@@ -32,7 +36,7 @@ def clean_meet_name(name: str) -> str:
 
 def make_abbreviations(tokens: set[str]) -> None:
     '''
-    Replaces any tokens that are in a key of MEET_NAME_ABBREVIATIONS with the
+    Replaces any tokens that are a key of MEET_NAME_ABBREVIATIONS with the
     corresponding value.
     '''
     for key, value in MEET_NAME_ABBREVIATIONS.items():
@@ -58,4 +62,6 @@ def meet_names_match(name1: str, name2: str) -> bool:
     name2_tokens -= MEET_NAME_REMOVABLE_TOKENS
     make_abbreviations(name1_tokens)
     make_abbreviations(name2_tokens)
+    # print(name1_tokens, name2_tokens)
     return name1_tokens == name2_tokens 
+

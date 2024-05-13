@@ -1,0 +1,143 @@
+{
+    "7": {
+        "(0, Estelle Davis)": {
+            "meet_date": "2023-03-11",
+            "meet_location": "J\u00f6nk\u00f6ping",
+            "meet_name": "UGP 2 (50m) \u00d6stsvenska 2023",
+            "result_url": "https://www.livetiming.se/results.php?cid=6870&session=0&all=1",
+            "splits": {
+                "100m": "1:23.83 (44.53)",
+                "50m": "39.30"
+            }
+        },
+        "(1, Tuva Svensson)": {
+            "Error": "Error getting LiveTiming meet id and location. Meet name: JSS Open 1306 2023."
+        },
+        "(2, Linn Olsson)": {
+            "Error": "Error getting splits from LiveTiming."
+        },
+        "(3, Felicia G\u00f6thberg)": {
+            "meet_date": "2024-04-13",
+            "meet_location": "Eriksdalsbadet",
+            "meet_name": "DM 2024 (50m) Stockholm",
+            "result_url": "https://www.livetiming.se/results.php?cid=8195&session=0&all=1",
+            "splits": {
+                "100m": "1:18.98 (42.35)",
+                "50m": "36.63"
+            }
+        },
+        "(4, Elin Rimskog)": {
+            "meet_date": "2023-07-14",
+            "meet_location": "Halmstad",
+            "meet_name": "Sum-Sim (50m) 2023",
+            "result_url": "https://www.livetiming.se/results.php?cid=7192&session=0&all=1",
+            "splits": {
+                "100m": "1:20.43 (42.40)",
+                "50m": "38.03"
+            }
+        },
+        "(5, Linnea Sj\u00f6berg)": {
+            "Error": "Error getting splits from LiveTiming."
+        },
+        "(6, Elin Bohman)": {
+            "meet_date": "2023-05-13",
+            "meet_location": "Uppsala",
+            "meet_name": "J\u00f6ns Svanbergsimmet 50m 2023",
+            "result_url": "https://www.livetiming.se/results.php?cid=7231&session=0&all=1",
+            "splits": {
+                "100m": "1:21.92 (42.47)",
+                "50m": "39.45"
+            }
+        },
+        "(7, Svea Str\u00f6mwall)": {
+            "meet_date": "2024-04-28",
+            "meet_location": "J\u00f6nk\u00f6ping",
+            "meet_name": "Rosenlundsbadet Sprint (50m) 2024",
+            "result_url": "https://www.livetiming.se/results.php?cid=7800&session=0&all=1",
+            "splits": {
+                "100m": "1:22.99 (44.25)",
+                "50m": "38.74"
+            }
+        },
+        "(8, Klara Segerstr\u00f6m)": {
+            "Error": "Error getting splits from LiveTiming."
+        },
+        "(9, Lottie Berglind)": {
+            "meet_date": "2024-03-23",
+            "meet_location": "V\u00e4ster\u00e5s",
+            "meet_name": "V\u00e4ster\u00e5s Meet 2024",
+            "result_url": "https://www.livetiming.se/results.php?cid=8051&session=0&all=1",
+            "splits": {
+                "100m": "1:22.74 (44.19)",
+                "50m": "38.55"
+            }
+        }
+    },
+    "8": {
+        "(0, Sara P\u00f6lkki)": {
+            "meet_date": "2024-03-09",
+            "meet_location": "Eriksdalsbadet",
+            "meet_name": "UGP2, 2024, Eriksdalsbadet",
+            "result_url": "https://www.livetiming.se/results.php?cid=8125&session=0&all=1",
+            "splits": {
+                "100m": "1:19.95 (42.52)",
+                "50m": "37.43"
+            }
+        },
+        "(1, Nelly Antl\u00f6v)": {
+            "meet_date": "2023-07-08",
+            "meet_location": "Varberg",
+            "meet_name": "Bockstendsdoppet 2023",
+            "result_url": "https://www.livetiming.se/results.php?cid=7239&session=0&all=1",
+            "splits": {
+                "100m": "1:18.28 (41.50)",
+                "50m": "36.78"
+            }
+        },
+        "(2, Maja Modin)": {
+            "Error": "Error getting LiveTiming meet id and location. Meet name: Malmsten Swim Open Stockholm 2024."
+        },
+        "(3, Lily Dymling)": {
+            "meet_date": "2024-04-13",
+            "meet_location": "Eriksdalsbadet",
+            "meet_name": "DM 2024 (50m) Stockholm",
+            "result_url": "https://www.livetiming.se/results.php?cid=8195&session=0&all=1",
+            "splits": {
+                "100m": "1:15.42 (39.11)",
+                "50m": "36.31"
+            }
+        },
+        "(4, Elsa Bergh)": {
+            "Error": "Error getting LiveTiming meet id and location. Meet name: Malmsten Swim Open Stockholm 2024."
+        },
+        "(5, Agnes Jonasson)": {
+            "Error": "Error getting LiveTiming meet id and location. Meet name: Malmsten Swim Open Stockholm 2024."
+        },
+        "(6, Sofia Travar)": {
+            "meet_date": "2024-03-23",
+            "meet_location": "V\u00e4ster\u00e5s",
+            "meet_name": "V\u00e4ster\u00e5s Meet 2024",
+            "result_url": "https://www.livetiming.se/results.php?cid=8051&session=0&all=1",
+            "splits": {
+                "100m": "1:16.70 (40.68)",
+                "50m": "36.02"
+            }
+        },
+        "(7, Vilma Holmer)": {
+            "Error": "Error getting LiveTiming meet id and location. Meet name: Malmsten Swim Open Stockholm 2024."
+        },
+        "(8, Mira Bj\u00f6rkman)": {
+            "Error": "Error getting splits from LiveTiming."
+        },
+        "(9, Ellen Hultsten)": {
+            "meet_date": "2024-02-18",
+            "meet_location": "J\u00e4rf\u00e4lla",
+            "meet_name": "J\u00e4rf\u00e4lla Nationella 2024",
+            "result_url": "https://www.livetiming.se/results.php?cid=7913&session=0&all=1",
+            "splits": {
+                "100m": "1:20.43 (43.30)",
+                "50m": "37.13"
+            }
+        }
+    }
+}
