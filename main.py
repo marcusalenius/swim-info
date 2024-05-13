@@ -282,7 +282,8 @@ def get_splits_from_swim(swim_row_texts: list[str]) -> dict[str, str]:
             if row_tokens[i] == '50m:':
                 splits['50m'] = row_tokens[i+1]
                 i += 2
-            if row_tokens[i][-1] == ':' and i+2 < len(row_tokens):
+            if (row_tokens[i][-1] == ':' and row_tokens[i][0].isdigit() and 
+                i+2 < len(row_tokens)):
                 # [:-1] to remove the colon
                 splits[row_tokens[i][:-1]] = ' '.join(row_tokens[i+1:i+3])
                 i += 3
@@ -291,6 +292,7 @@ def get_splits_from_swim(swim_row_texts: list[str]) -> dict[str, str]:
     return splits
 
 def get_splits_from_event_edition(event_name: str,
+                                  meet_year: int,
                                   event_edition_row_texts: list[str], 
                                   swimmer_data: dict[str, str]
                                   ) -> dict[str, str] | None:
@@ -306,12 +308,15 @@ def get_splits_from_event_edition(event_name: str,
         if row_text == '': continue
         row_tokens = row_text.split(' ')
         if (f'{row_tokens[1]} {row_tokens[2]}' == swimmer_data['name']
-            and row_tokens[3] == swimmer_data['born']):
+            and row_tokens[3].isdigit() and 
+            (row_tokens[3] == swimmer_data['born'] or 
+             meet_year - int(row_tokens[3]) == int(swimmer_data['born']))):
             if is_fifty_event:
                 return {'50m': get_fifty_results(row_text)}
             in_correct_swim = True
             continue
-        if in_correct_swim and row_tokens[0].isdigit():
+        if (in_correct_swim and 
+            (row_tokens[0].isdigit() or row_tokens[0][0] == '=')):
             in_correct_swim = False
             if swim_row_texts != []:
                 return get_splits_from_swim(swim_row_texts)
@@ -320,7 +325,9 @@ def get_splits_from_event_edition(event_name: str,
             swim_row_texts.append(row_text)
     return None
 
-def get_splits_from_meet(meet_id: str, swimmer_data: dict[str, str], 
+def get_splits_from_meet(meet_id: str, 
+                         meet_year: int,
+                         swimmer_data: dict[str, str], 
                          event_name: str) -> dict[str, str] | None:
     '''
     Returns the splits for the swimmer in the given event at the given meet.
@@ -353,7 +360,7 @@ def get_splits_from_meet(meet_id: str, swimmer_data: dict[str, str],
             in_correct_event = False
             in_swimmer_rows = False
             if curr_event_edition_row_texts != []:
-                splits = get_splits_from_event_edition(event_name, 
+                splits = get_splits_from_event_edition(event_name, meet_year,
                                                 curr_event_edition_row_texts, 
                                                 swimmer_data)
                 if splits is not None:
@@ -382,18 +389,21 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
     '''
     swimmer_id = get_swimmer_id(swimmer_data)
     if swimmer_id is None:
-        return {'Error' : 'Error getting Tempus swimmer id.'}
+        return {'Error' : 'Error getting Tempus swimmer id. '
+                          f'Swimmer name: {swimmer_data["name"]}.'}
     # ensure that the event name is in the correct format
     event_name = ' '.join(event_name.split(' ')[:2])
     event_id = get_event_id(event_name, pool)
     if event_id is None:
-        return {'Error' : 'Error getting Tempus event id.'}
+        return {'Error' : 'Error getting Tempus event id. '
+                          f'Event name: {event_name}, Pool: {pool}.'}
     meet_name, meet_date = get_meet_name_and_date(swimmer_id, event_id)
     meet_id, meet_location = get_meet_id_and_location(meet_name, meet_date)
     if meet_id is None or meet_location is None:
         return {'Error' : 'Error getting LiveTiming meet id and location. '
                           f'Meet name: {meet_name}.'}
-    splits = get_splits_from_meet(meet_id, swimmer_data, event_name)
+    meet_year = int(meet_date[:4])
+    splits = get_splits_from_meet(meet_id, meet_year, swimmer_data, event_name)
     if splits is None:
         return {'Error' : 'Error getting splits from LiveTiming. '
                           f'Meet name: {meet_name}. Meet id: {meet_id}.'}
