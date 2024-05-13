@@ -14,7 +14,7 @@
             "Error": "Error getting LiveTiming meet id and location. Meet name: JSS Open 1306 2023."
         },
         "(2, Linn Olsson)": {
-            "Error": "Error getting splits from LiveTiming."
+            "Error": "Error getting splits from LiveTiming. Meet name: Ungdoms-GP 2 med Eskilstuna Sprint (50m) 2024. Meet id: 8032."
         },
         "(3, Felicia G\u00f6thberg)": {
             "meet_date": "2024-04-13",
@@ -37,7 +37,15 @@
             }
         },
         "(5, Linnea Sj\u00f6berg)": {
-            "Error": "Error getting splits from LiveTiming."
+            "meet_date": "2022-04-05",
+            "meet_location": "M\u00e4kel\u00e4nrinne",
+            "meet_name": "Speedo Helsinki Swim Meet",
+            "result_url": "https://www.livetiming.se/results.php?cid=6565&session=0&all=1",
+            "splits": {
+                "100m": "1:21.11 (43.71)",
+                "50m": "37.40",
+                "time": "1:25.16 (-4.05)"
+            }
         },
         "(6, Elin Bohman)": {
             "meet_date": "2023-05-13",
@@ -60,7 +68,7 @@
             }
         },
         "(8, Klara Segerstr\u00f6m)": {
-            "Error": "Error getting splits from LiveTiming."
+            "Error": "Error getting splits from LiveTiming. Meet name: Ungdoms-GP 2 med Eskilstuna Sprint (50m) 2024. Meet id: 8032."
         },
         "(9, Lottie Berglind)": {
             "meet_date": "2024-03-23",
@@ -95,7 +103,14 @@
             }
         },
         "(2, Maja Modin)": {
-            "Error": "Error getting splits from LiveTiming."
+            "meet_date": "2024-04-08",
+            "meet_location": "Stockholm",
+            "meet_name": "Malmsten Swim Open Stockholm 2024",
+            "result_url": "https://www.livetiming.se/results.php?cid=7976&session=0&all=1",
+            "splits": {
+                "100m": "1:16.20 (40.63)",
+                "50m": "35.57"
+            }
         },
         "(3, Lily Dymling)": {
             "meet_date": "2024-04-13",
@@ -108,10 +123,24 @@
             }
         },
         "(4, Elsa Bergh)": {
-            "Error": "Error getting splits from LiveTiming."
+            "meet_date": "2024-04-08",
+            "meet_location": "Stockholm",
+            "meet_name": "Malmsten Swim Open Stockholm 2024",
+            "result_url": "https://www.livetiming.se/results.php?cid=7976&session=0&all=1",
+            "splits": {
+                "100m": "1:11.30 (37.70)",
+                "50m": "33.60"
+            }
         },
         "(5, Agnes Jonasson)": {
-            "Error": "Error getting splits from LiveTiming."
+            "meet_date": "2024-04-08",
+            "meet_location": "Stockholm",
+            "meet_name": "Malmsten Swim Open Stockholm 2024",
+            "result_url": "https://www.livetiming.se/results.php?cid=7976&session=0&all=1",
+            "splits": {
+                "100m": "1:13.94 (38.48)",
+                "50m": "35.46"
+            }
         },
         "(6, Sofia Travar)": {
             "meet_date": "2024-03-23",
@@ -124,10 +153,17 @@
             }
         },
         "(7, Vilma Holmer)": {
-            "Error": "Error getting splits from LiveTiming."
+            "meet_date": "2024-04-08",
+            "meet_location": "Stockholm",
+            "meet_name": "Malmsten Swim Open Stockholm 2024",
+            "result_url": "https://www.livetiming.se/results.php?cid=7976&session=0&all=1",
+            "splits": {
+                "100m": "1:16.82 (41.05)",
+                "50m": "35.77"
+            }
         },
         "(8, Mira Bj\u00f6rkman)": {
-            "Error": "Error getting splits from LiveTiming."
+            "Error": "Error getting splits from LiveTiming. Meet name: Ungdoms-GP 2 med Eskilstuna Sprint (50m) 2024. Meet id: 8032."
         },
         "(9, Ellen Hultsten)": {
             "meet_date": "2024-02-18",

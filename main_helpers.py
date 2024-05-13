@@ -1,12 +1,5 @@
 
 
-def is_correct_event(row_text: str, event_name: str) -> bool:
-    '''
-    Returns True if the row text is the correct event, False otherwise.
-    '''
-    event_tokens = row_text.lower().split(' ')
-    return f'{event_tokens[2]} {event_tokens[3]}' == event_name.lower()
-
 def convert_times_from_splits(non_none_splits: list[dict[str, str]]
                               ) -> list[tuple[int]]:
     '''

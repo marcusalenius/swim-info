@@ -86,6 +86,7 @@ import json
 
 from utilities import get_element_text
 from meet_matcher import meet_names_match
+from event_matcher import is_correct_event
 from event_ids import TEMPUS_EVENT_IDs
 from swimmer_id_cache import (load_stored_swimmer_id_cache, 
                               save_swimmer_id_cache, 
@@ -99,8 +100,7 @@ from meet_results_cache import (load_stored_meet_results_cache,
                                 save_meet_results_cache,
                                 get_cached_meet_results,
                                 add_meet_results_to_cache)
-from main_helpers import (is_correct_event, 
-                          fastest_swim,
+from main_helpers import (fastest_swim,
                           get_fifty_results)
 
 LIVETIMING_SESSION_URL = (
@@ -339,21 +339,25 @@ def get_splits_from_meet(meet_id: str, swimmer_data: dict[str, str],
     in_swimmer_rows = False
     for row_text in meet_results_row_texts:
         if row_text == '': continue
-        if row_text[:5] == 'Gren ' and is_correct_event(row_text, event_name):
+        if ((row_text[:5] == 'Gren ' or row_text[:6] == 'Event ') and 
+            (is_correct_event(row_text, event_name))):
             in_correct_event = True
             continue
-        if in_correct_event and row_text[:10] == 'Plac Namn ':
+        if ((in_correct_event) and 
+            (row_text[:10] == 'Plac Namn ' or row_text[:10] == 'Rank Name ')):
             in_swimmer_rows = True
             continue
         if (in_correct_event and in_swimmer_rows and 
-            row_text[:17] == 'Grenen officiell:'):
+            (row_text[:16] == 'Grenen officiell' or 
+             row_text[:14] == 'Event official')):
             in_correct_event = False
             in_swimmer_rows = False
             if curr_event_edition_row_texts != []:
                 splits = get_splits_from_event_edition(event_name, 
                                                 curr_event_edition_row_texts, 
                                                 swimmer_data)
-                all_splits.append(splits)
+                if splits is not None:
+                    all_splits.append(splits)
                 curr_event_edition_row_texts = []
             continue
         if in_correct_event and in_swimmer_rows:
@@ -391,7 +395,8 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
                           f'Meet name: {meet_name}.'}
     splits = get_splits_from_meet(meet_id, swimmer_data, event_name)
     if splits is None:
-        return {'Error' : 'Error getting splits from LiveTiming.'}
+        return {'Error' : 'Error getting splits from LiveTiming. '
+                          f'Meet name: {meet_name}. Meet id: {meet_id}.'}
     result_url = (
         f'https://www.livetiming.se/results.php?cid={meet_id}&session=0&all=1')
     # assemble the best swim dictionary
