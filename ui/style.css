@@ -24,7 +24,6 @@ body {
 }
 
 h1, h2, h3 {
-    font-family: 'Montserrat';
     font-style: normal;
     font-weight: 600;
     color: var(--text-gray-1);
@@ -51,7 +50,7 @@ h3 {
     margin-bottom: 20px;
 }
 
-p {
+p, a {
     font-style: normal;
     font-weight: 500;
 }
@@ -68,15 +67,43 @@ p {
     color: var(--text-gray-1);
 }
 
+.pt14-gray3 {
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--text-gray-3);
+}
+
+.pt12-gray1 {
+    font-size: 12px;
+    line-height: 15px;
+    color: var(--text-gray-1);
+}
+
+.pt12-gray2 {
+    font-size: 12px;
+    line-height: 15px;
+    color: var(--text-gray-2);
+}
+
 .pt12-gray3 {
     font-size: 12px;
     line-height: 15px;
     color: var(--text-gray-3);
 }
 
-.event-selected .pt16, .heat-selected .pt16, .swimmer-selected .pt14-gray1 {
+a {
+    font-size: 14px;
+    line-height: 17px;
+    text-decoration: underline;
+    color: var(--text-gray-1);
+}
+
+
+.event-selected .pt16, .heat-selected .pt16, .swimmer-selected :not(.split-row-time).pt14-gray1 {
     font-weight: 600;
 }
+
+
 
 .two-columns {
     display: flex;
@@ -211,3 +238,59 @@ p {
     rotate: 180deg;
 }
 
+
+.swimmer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 13px;
+    padding-left: 50px;
+    padding-right: 40px;
+    padding-top: 6px;
+    padding-bottom: 12px;
+}
+
+.swimmer-content-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+}
+
+.swimmer-content-avg50 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.swimmer-content-splits {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    height: fit-content;
+}
+
+.split-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 28px;
+    width: 100%;
+    border-bottom: 1px solid var(--line-gray);
+}
+
+.split-row-col1 {
+    width: 214px;
+}
+
+.split-row-col {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.split-row-distance {
+    width: 56px;
+}
