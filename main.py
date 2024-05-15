@@ -518,13 +518,15 @@ def get_best_swims_for_session(session_url: str) -> dict:
     session_best_swims = dict()
     for row in session_trs[1:]:
         tds = row.find_all('td')
+        event_number = get_element_text(tds[0])
         for td in tds:
             if get_element_text(td) == 'Heatlista':
                 link = td.find('a')['href']
                 event_heat_list_url = f'https://www.livetiming.se/{link}'
                 event_name, event_best_swims = get_best_swims_for_event(
                     event_heat_list_url)
-                session_best_swims[event_name] = event_best_swims
+                session_best_swims[f'({event_number}, {event_name})'] = (
+                    event_best_swims)
     return session_best_swims
 
 def main():
@@ -538,7 +540,7 @@ def main():
     save_meet_id_and_location_cache()
     save_meet_results_cache()
 
-    with open('output.json', 'w') as file:
+    with open('output.json', 'w', encoding='utf-8') as file:
         json.dump(session_best_swims, file, indent=4, sort_keys=True)
 
 
