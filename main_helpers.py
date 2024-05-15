@@ -57,3 +57,44 @@ def get_fifty_results(row_text: str) -> str:
     if row_tokens[-1][0] == '+':
         return row_tokens[-2]
     return row_tokens[-1]
+
+def final_time(splits: dict[str, str]) -> str:
+    '''
+    Returns the final time of a swim from the splits.
+    '''
+    assert(splits is not None)
+    splits_list = list(splits.items())
+    # make keys integers
+    splits_list = [(int(key[:-1]), value) for key, value in splits_list]
+    # remove the last 50m time from splits_list
+    splits_list = [(key, value.split(' ')[0]) for key, value in splits_list]
+    splits_list.sort(key=lambda key_value: key_value[0])
+    return splits_list[-1][1]
+
+def avg50(splits: dict[str, str]) -> str | None:
+    '''
+    Returns the average 50m time of a swim from the splits. The first and
+    last 50m splits are ignored. If the swim is 100m or less, returns None.
+    '''
+    assert(splits is not None)
+    if len(splits) <= 2:
+        return None
+    splits = list(splits.items())
+    # make keys integers
+    splits = [(int(key[:-1]), value) for key, value in splits]
+    # keep the last 50m time from splits
+    fifty_times = []
+    for key, value in splits:
+        time_tokens = value.split(' ')
+        # 50m
+        if len(time_tokens) == 1:
+            fifty_times.append((key, time_tokens[0]))
+        else:
+            fifty_times.append((key, time_tokens[1][1:-1]))
+    fifty_times.sort(key=lambda key_value: key_value[0])
+    # exclude the first and last 50m times
+    fifty_times = fifty_times[1:-1]
+    fifty_times = [float(value) for _, value in fifty_times]
+    avg_fifty = sum(fifty_times)/len(fifty_times)
+    avg_fifty = round(avg_fifty, 2)
+    return str(avg_fifty)

@@ -107,7 +107,9 @@ from cache.meet_results_cache import (load_stored_meet_results_cache,
                                       get_cached_meet_results,
                                       add_meet_results_to_cache)
 from main_helpers import (fastest_swim,
-                          get_fifty_results)
+                          get_fifty_results,
+                          final_time,
+                          avg50)
 
 LIVETIMING_SESSION_URL = (
     'https://www.livetiming.se/program.php?cid=8051&session=1')
@@ -341,7 +343,8 @@ def get_splits_from_meet(meet_id: str,
     request is made to LiveTiming to get the meet results.
 
     If the swimmer swam the event multiple times, only the splits of the 
-    fastest swim are returned. Returns None if the event is not found. 
+    fastest swim are returned. Returns None if the event is not found or if 
+    there are no 50 splits.
     
     Called once by get_best_swim_for_swimmer.
     '''
@@ -377,7 +380,10 @@ def get_splits_from_meet(meet_id: str,
             curr_event_edition_row_texts.append(row_text)
     if all_splits == []:
         return None
-    return fastest_swim(all_splits)
+    fastest_swim_splits = fastest_swim(all_splits)
+    if '50m' not in fastest_swim_splits:
+        return None
+    return fastest_swim_splits
 
 def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
                               pool: str) -> dict:
@@ -389,6 +395,8 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
             'meet_date': 'date',
             'meet_location': 'location',
             'result_url': 'url',
+            'final_time': 'time',
+            'avg50': 'time',
             'splits': { '50': 'time', '100': 'time (last 50 time)', ... }
         }
     Called for each swimmer in a heat by get_best_swims_for_heat.
@@ -422,6 +430,8 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
     best_swim['meet_location'] = meet_location
     best_swim['result_url'] = result_url
     best_swim['splits'] = splits
+    best_swim['final_time'] = final_time(splits)
+    best_swim['avg50'] = avg50(splits)
     return best_swim
 
 def get_best_swims_for_heat(heat_rows: list, event_name: str,
@@ -548,7 +558,7 @@ def get_meet_and_session_data(session_url: str) -> dict:
     session_data = dict()
     session_data['meet_name'] = meet_name
     session_data['session_number'] = session_number
-    session_data['best_swims'] = session_best_swims
+    session_data['events'] = session_best_swims
     return session_data
 
 
