@@ -14,7 +14,7 @@ def load_stored_meet_id_and_location_cache() -> None:
     '''
     global meet_id_and_location_cache
     try:
-        with open('meet_id_cache.json', 'r') as file:
+        with open('cache/meet_id_cache.json', 'r') as file:
             meet_id_and_location_cache = json.load(file)
     except json.decoder.JSONDecodeError: 
         pass
@@ -23,7 +23,7 @@ def save_meet_id_and_location_cache() -> None:
     '''
     Saves the cache to a file.
     '''
-    with open('meet_id_cache.json', 'w') as file:
+    with open('cache/meet_id_cache.json', 'w') as file:
         json.dump(meet_id_and_location_cache, file, indent=4)
 
 def get_cached_meet_id_and_location(meet_name: str) -> str | None:

@@ -88,18 +88,18 @@ from utilities import get_element_text
 from meet_matcher import meet_names_match
 from event_matcher import is_correct_event
 from event_ids import TEMPUS_EVENT_IDs
-from swimmer_id_cache import (load_stored_swimmer_id_cache, 
-                              save_swimmer_id_cache, 
-                              get_cached_swimmer_id, 
-                              add_swimmer_id_to_cache)
-from meet_id_cache import (load_stored_meet_id_and_location_cache,
-                           save_meet_id_and_location_cache,
-                           get_cached_meet_id_and_location, 
-                           add_meet_id_and_location_to_cache)
-from meet_results_cache import (load_stored_meet_results_cache,
-                                save_meet_results_cache,
-                                get_cached_meet_results,
-                                add_meet_results_to_cache)
+from cache.swimmer_id_cache import (load_stored_swimmer_id_cache, 
+                                    save_swimmer_id_cache, 
+                                    get_cached_swimmer_id, 
+                                    add_swimmer_id_to_cache)
+from cache.meet_id_cache import (load_stored_meet_id_and_location_cache,
+                                 save_meet_id_and_location_cache,
+                                 get_cached_meet_id_and_location, 
+                                 add_meet_id_and_location_to_cache)
+from cache.meet_results_cache import (load_stored_meet_results_cache,
+                                      save_meet_results_cache,
+                                      get_cached_meet_results,
+                                      add_meet_results_to_cache)
 from main_helpers import (fastest_swim,
                           get_fifty_results)
 

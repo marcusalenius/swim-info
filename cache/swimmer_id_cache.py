@@ -23,7 +23,7 @@ def load_stored_swimmer_id_cache() -> None:
     '''
     global swimmer_id_cache
     try:
-        with open('swimmer_id_cache.json', 'r') as file:
+        with open('cache/swimmer_id_cache.json', 'r') as file:
             swimmer_id_cache = json.load(file)
     except json.decoder.JSONDecodeError: 
         pass
@@ -32,7 +32,7 @@ def save_swimmer_id_cache() -> None:
     '''
     Saves the cache to a file.
     '''
-    with open('swimmer_id_cache.json', 'w') as file:
+    with open('cache/swimmer_id_cache.json', 'w') as file:
         json.dump(swimmer_id_cache, file, indent=4)
 
 def get_cached_swimmer_id(swimmer_data: dict[str, str]) -> str | None:

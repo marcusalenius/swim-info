@@ -13,7 +13,7 @@ def load_stored_meet_results_cache() -> None:
     '''
     global meet_results_cache
     try:
-        with open('meet_results_cache.json', 'r') as file:
+        with open('cache/meet_results_cache.json', 'r') as file:
             meet_results_cache = json.load(file)
     except json.decoder.JSONDecodeError: 
         pass
@@ -22,7 +22,7 @@ def save_meet_results_cache() -> None:
     '''
     Saves the cache to a file.
     '''
-    with open('meet_results_cache.json', 'w') as file:
+    with open('cache/meet_results_cache.json', 'w') as file:
         json.dump(meet_results_cache, file, indent=4)
 
 def get_cached_meet_results(meet_id: str) -> list[str] | None:
