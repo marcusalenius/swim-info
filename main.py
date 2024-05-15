@@ -1,10 +1,16 @@
 '''
 Main call chain:
 
-get_best_swims_for_session
+get_meet_and_session_data
  |  called:    1 time
  |  cached:    no
  |  request:   GET to LiveTiming
+ |  iterates:  no
+ V
+get_best_swims_for_session
+ |  called:    1 time
+ |  cached:    no
+ |  request:   no
  |  iterates:  through the events in the session
  V
 get_best_swims_for_event
@@ -504,16 +510,14 @@ def get_best_swims_for_event(event_heat_list_url: str) -> tuple[str, dict]:
 # save_meet_id_and_location_cache()
 # save_meet_results_cache()
 
-def get_best_swims_for_session(session_url: str) -> dict:
+def get_best_swims_for_session(session_soup) -> dict:
     '''
     Iterates through the events in a session and gets the best swims for each
     event. Returns a dictionary where the keys are event names and the values
     are dictionaries where the keys are lane numbers and swimmer names, and the
-    values are dictionaries with their best swims. Makes a GET request to
-    LiveTiming. Called once by the main function.
+    values are dictionaries with their best swims. Called once by 
+    get_meet_and_session_data.
     '''
-    session_page = requests.get(session_url)
-    session_soup = BeautifulSoup(session_page.content, 'html.parser')
     session_trs = session_soup.find_all('tr')
     session_best_swims = dict()
     for row in session_trs[1:]:
@@ -529,12 +533,32 @@ def get_best_swims_for_session(session_url: str) -> dict:
                     event_best_swims)
     return session_best_swims
 
+def get_meet_and_session_data(session_url: str) -> dict:
+    '''
+    Returns a dictionary with the meet name, session number, and the best swims
+    for the session. Called once by the main function. Makes a GET request to 
+    LiveTiming.
+    '''
+    session_page = requests.get(session_url)
+    session_soup = BeautifulSoup(session_page.content, 'html.parser')
+    meet_name = ' '.join(get_element_text(session_soup.find('h1'))
+                         .split(' ')[2:])
+    session_number = session_url.split('=')[-1]
+    session_best_swims = get_best_swims_for_session(session_soup)
+    session_data = dict()
+    session_data['meet_name'] = meet_name
+    session_data['session_number'] = session_number
+    session_data['best_swims'] = session_best_swims
+    return session_data
+
+
+
+
 def main():
     load_stored_swimmer_id_cache()
     load_stored_meet_id_and_location_cache()
     load_stored_meet_results_cache()
-    # session_best_swims = get_best_swims_for_session(LIVETIMING_SESSION_URL)
-    session_best_swims = time_function(get_best_swims_for_session,
+    session_best_swims = time_function(get_meet_and_session_data,
                                        LIVETIMING_SESSION_URL)
     save_swimmer_id_cache()
     save_meet_id_and_location_cache()
