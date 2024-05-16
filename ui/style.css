@@ -104,6 +104,11 @@ a {
 }
 
 
+.hidden {
+    display: none;
+}
+
+
 
 .two-columns {
     display: flex;
@@ -139,6 +144,7 @@ a {
 
 .event-item-text {
     display: flex;
+    pointer-events: none;
 }
 
 .event-item-number {

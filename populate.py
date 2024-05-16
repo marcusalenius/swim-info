@@ -18,7 +18,7 @@ EVENT_ITEM_TEMPLATE = '''\
 '''
 
 RIGHT_COLUMN_TEMPLATE = '''\
-<div class="right-column">
+<div class="right-column hidden">
   <h3></h3>
   <div class="heat-list"></div>
 </div>
@@ -142,6 +142,8 @@ def populate_event_menu(page_soup, events: dict) -> None:
         event_name = event_tokens[1]
 
         event_soup = BeautifulSoup(EVENT_ITEM_TEMPLATE, 'html.parser')
+        event_soup.find('div', class_='event-item')['id'] = (
+            f'event-item-{event_number}')
         event_soup.find('p', class_='event-item-number').string = event_number
         event_soup.find('p', class_='event-item-name').string = event_name
 
@@ -280,6 +282,8 @@ def add_right_columns(page_soup, events: dict) -> None:
         event_name = event_tokens[1]
 
         right_column_soup = BeautifulSoup(RIGHT_COLUMN_TEMPLATE, 'html.parser')
+        right_column_soup.find('div', class_='right-column')['id'] = (
+            f'right-column-{event_number}')
         right_column_soup.h3.string = f'Gren {event_number}, {event_name}'
 
         add_heats(right_column_soup, heats)
