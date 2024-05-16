@@ -5,6 +5,8 @@ window.addEventListener('click', event => {
         handleEventItemClick(element);
     } else if (element.classList.contains('heat-container')) {
         handleHeatContainerClick(element);
+    } else if (element.classList.contains('swimmer-container')) {
+        handleSwimmerContainerClick(element);
     }
 });
 
@@ -42,10 +44,7 @@ function handleHeatContainerClick(element) {
     // clicked on the selected heat-container
     if (element.classList.contains('heat-selected')) {
         element.classList.remove('heat-selected');
-        const allHeatContainers = document.querySelectorAll('.heat-container');
-        allHeatContainers.forEach(container => {
-            container.querySelector('.heat-content').classList.add('hidden');
-        });
+        element.querySelector('.heat-content').classList.add('hidden');
         return;
     }
 
@@ -62,5 +61,19 @@ function handleHeatContainerClick(element) {
         heatContent.classList.add('hidden');
     });
     element.querySelector('.heat-content').classList.remove('hidden');
+}
 
+function handleSwimmerContainerClick(element) {
+    // clicked on the selected swimmer-container
+    if (element.classList.contains('swimmer-selected')) {
+        element.classList.remove('swimmer-selected');
+        element.querySelector('.swimmer-content').classList.add('hidden');
+        return;
+    }
+
+    // show the selected swimmer-container
+    element.classList.add('swimmer-selected');
+
+    // show swimmer-content
+    element.querySelector('.swimmer-content').classList.remove('hidden');
 }

@@ -207,7 +207,7 @@ a {
     padding: 0px;
     width: fit-content;
     height: fit-content;
-    border-bottom: 1px solid var(--line-gray)
+    border-bottom: 1px solid var(--line-gray);
 }
 
 .swimmer-item {
@@ -215,7 +215,8 @@ a {
     align-items: center;
     width: 664px;
     height: 36px;
-    border-top: 1px solid var(--line-gray)
+    border-top: 1px solid var(--line-gray);
+    pointer-events: none;
 }
 
 .swimmer-item-content {

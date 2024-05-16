@@ -65,7 +65,7 @@ SWIMMER_ITEM_TEMPLATE = '''\
 '''
 
 SWIMMER_CONTENT_TEMPLATE = '''\
-<div class="swimmer-content">
+<div class="swimmer-content hidden">
   <div class="swimmer-content-text">
     <a target="_blank"></a>
     <p class="pt12-gray2"></p>
@@ -217,6 +217,11 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
             swimmer_container_soup.find('div', 
                                         class_='swimmer-container').append(
                                             swimmer_item_soup)
+            swimmer_content_soup = BeautifulSoup(SWIMMER_CONTENT_TEMPLATE, 
+                                            'html.parser')
+            swimmer_container_soup.find('div', 
+                                        class_='swimmer-container').append(
+                                            swimmer_content_soup)
             heat_content_soup.find('div', class_='swimmer-list').append(
                 swimmer_container_soup)
             continue
