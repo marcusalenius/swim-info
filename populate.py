@@ -8,7 +8,7 @@ import json
 from pprint import pprint 
 
 
-EVENT_ITEM_TEMPLATE = '''
+EVENT_ITEM_TEMPLATE = '''\
 <div class="event-item">
   <div class="event-item-text">
     <p class="event-item-number pt16"></p>
@@ -17,18 +17,18 @@ EVENT_ITEM_TEMPLATE = '''
 </div>
 '''
 
-RIGHT_COLUMN_TEMPLATE = '''
+RIGHT_COLUMN_TEMPLATE = '''\
 <div class="right-column">
   <h3></h3>
   <div class="heat-list"></div>
 </div>
 '''
 
-HEAT_CONTAINER_TEMPLATE = '''
+HEAT_CONTAINER_TEMPLATE = '''\
 <div class="heat-container"></div>
 '''
 
-HEAT_ITEM_TEMPLATE = '''
+HEAT_ITEM_TEMPLATE = '''\
 <div class="heat-item">
   <div class="heat-item-text">
     <p class="pt16"></p>
@@ -36,7 +36,7 @@ HEAT_ITEM_TEMPLATE = '''
 </div>  
 '''
 
-HEAT_CONTENT_TEMPLATE = '''
+HEAT_CONTENT_TEMPLATE = '''\
 <div class="heat-content">
   <div class="heat-column-headers">
     <p class="heat-column-header-lane pt12-gray3">Bana</p>
@@ -47,11 +47,11 @@ HEAT_CONTENT_TEMPLATE = '''
 </div>
 '''
 
-SWIMMER_CONTAINER_TEMPLATE = '''
+SWIMMER_CONTAINER_TEMPLATE = '''\
 <div class="swimmer-container"></div>
 '''
 
-SWIMMER_ITEM_TEMPLATE = '''
+SWIMMER_ITEM_TEMPLATE = '''\
 <div class="swimmer-item">
   <div class="swimmer-item-content">
     <div class="swimmer-item-text">
@@ -64,7 +64,7 @@ SWIMMER_ITEM_TEMPLATE = '''
 </div>
 '''
 
-SWIMMER_CONTENT_TEMPLATE = '''
+SWIMMER_CONTENT_TEMPLATE = '''\
 <div class="swimmer-content">
   <div class="swimmer-content-text">
     <a target="_blank"></a>
@@ -78,7 +78,7 @@ SWIMMER_CONTENT_TEMPLATE = '''
 </div>
 '''
 
-SPLIT_ROW_TEMPLATE = '''
+SPLIT_ROW_TEMPLATE = '''\
 <div class="split-row">
   <div class="split-row-col split-row-col1">
     <p class="split-row-distance pt14-gray3"></p>
@@ -159,7 +159,6 @@ def add_splits(swimmer_content_soup, splits: dict) -> None:
     # make keys integers
     splits_list = [(int(key[:-1]), value) for key, value in splits_list]
     splits_list.sort(key=lambda key_value: key_value[0])
-    pprint(splits_list)
     for split_index in range(0, len(splits_list), 2):
         split_row_soup = BeautifulSoup(SPLIT_ROW_TEMPLATE, 'html.parser')
         for col_index in range(2):
@@ -176,7 +175,12 @@ def add_splits(swimmer_content_soup, splits: dict) -> None:
             col = split_row_soup.find(
                 'div', class_=f'split-row-col{col_index+1}')
             col.find('p', class_='split-row-distance').string = distance
-            col.find('p', class_='split-row-time').string = distance_time
+            col.find('p', class_='split-row-time').string = distance_time + ' '
+            if last_fifty is not None:
+                span_soup = BeautifulSoup(
+                    f'<span class="last-50 pt14-gray3">{last_fifty}</span>', 
+                    'html.parser')
+                col.find('p', class_='split-row-time').append(span_soup)
         
         swimmer_content_soup.find('div', 
                                   class_='swimmer-content-splits').append(
@@ -191,14 +195,13 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
     Adds 'swimmer-list' to 'heat-content'.
     '''
     swimmers = list(swimmers.items())
-    # key has format ('lane, name')
+    # key has format '(lane, name)'
     swimmers.sort(key=lambda swimmer: int(swimmer[0][1:-1].split(', ')[0]))
     for swimmer_string, best_swim_info in swimmers:
         swimmer_string = swimmer_string[1:-1]
         swimmer_tokens = swimmer_string.split(', ')
         lane_number = swimmer_tokens[0]
         swimmer_name = swimmer_tokens[1]
-
 
         swimmer_container_soup = BeautifulSoup(SWIMMER_CONTAINER_TEMPLATE, 
                                                'html.parser')
@@ -209,13 +212,16 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
         swimmer_item_soup.find('p', class_='swimmer-item-name').string = (
             swimmer_name)
         if 'Error' in best_swim_info:
-            swimmer_container_soup.append(swimmer_item_soup)
+            swimmer_container_soup.find('div', 
+                                        class_='swimmer-container').append(
+                                            swimmer_item_soup)
             heat_content_soup.find('div', class_='swimmer-list').append(
                 swimmer_container_soup)
             continue
         swimmer_item_soup.find('p', class_='swimmer-item-best').string = (
             best_swim_info['final_time'])
-        swimmer_container_soup.append(swimmer_item_soup)
+        swimmer_container_soup.find('div', class_='swimmer-container').append(
+                swimmer_item_soup)
 
         # add swimmer content
         swimmer_content_soup = BeautifulSoup(SWIMMER_CONTENT_TEMPLATE, 
@@ -230,7 +236,8 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
             best_swim_info['avg50'] if best_swim_info['avg50'] is not None
                                     else 'N/A')
         add_splits(swimmer_content_soup, best_swim_info['splits'])
-        swimmer_container_soup.append(swimmer_content_soup)
+        swimmer_container_soup.find('div', class_='swimmer-container').append(
+                swimmer_content_soup)
 
         # add to heat content
         heat_content_soup.find('div', class_='swimmer-list').append(
@@ -246,14 +253,16 @@ def add_heats(right_column_soup, heats: dict) -> None:
     for number, swimmers in heats:
         heat_container_soup = BeautifulSoup(HEAT_CONTAINER_TEMPLATE, 
                                             'html.parser')
+        heat_container_div = heat_container_soup.find(
+            'div', class_='heat-container')
         # add heat item
         heat_item_soup = BeautifulSoup(HEAT_ITEM_TEMPLATE, 'html.parser')
         heat_item_soup.p.string = f'Heat {number} ({number_of_heats})'
-        heat_container_soup.append(heat_item_soup)
+        heat_container_div.append(heat_item_soup)
         # add heat content
         heat_content_soup = BeautifulSoup(HEAT_CONTENT_TEMPLATE, 'html.parser')
         add_swimmers(heat_content_soup, swimmers)
-        heat_container_soup.append(heat_content_soup)
+        heat_container_div.append(heat_content_soup)
 
         # add to right column
         right_column_soup.find('div', class_='heat-list').append(
@@ -276,9 +285,9 @@ def add_right_columns(page_soup, events: dict) -> None:
         add_heats(right_column_soup, heats)
 
         
-        if event_number == '4': # temporary
+        # if event_number == '4': # temporary
             # add to page
-            page_soup.find('div', class_='two-columns').append(right_column_soup)
+        page_soup.find('div', class_='two-columns').append(right_column_soup)
 
 
         
