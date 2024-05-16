@@ -3,19 +3,31 @@ window.addEventListener('click', event => {
     const element = event.target;
     if (element.classList.contains('event-item')) {
         handleEventItemClick(element);
+    } else if (element.classList.contains('heat-container')) {
+        handleHeatContainerClick(element);
     }
 });
 
 
 function handleEventItemClick(element) {
-    // switch the selected item
+    // clicked on the selected event-item
+    if (element.classList.contains('event-selected')) {
+        element.classList.remove('event-selected');
+        const allRightColumns = document.querySelectorAll('.right-column');
+        allRightColumns.forEach(column => {
+            column.classList.add('hidden');
+        });    
+        return;
+    }
+
+    // switch the selected event-item
     const allEventItems = document.querySelectorAll('.event-item');
     allEventItems.forEach(item => {
         item.classList.remove('event-selected');
     });
     element.classList.add('event-selected');
 
-    // switch the right column
+    // switch shown right column
     const allRightColumns = document.querySelectorAll('.right-column');
     allRightColumns.forEach(column => {
         column.classList.add('hidden');
@@ -24,4 +36,31 @@ function handleEventItemClick(element) {
     const thisRightColumn = document
         .querySelector(`#right-column-${numericId}`);
     thisRightColumn.classList.remove('hidden');
+}
+
+function handleHeatContainerClick(element) {
+    // clicked on the selected heat-container
+    if (element.classList.contains('heat-selected')) {
+        element.classList.remove('heat-selected');
+        const allHeatContainers = document.querySelectorAll('.heat-container');
+        allHeatContainers.forEach(container => {
+            container.querySelector('.heat-content').classList.add('hidden');
+        });
+        return;
+    }
+
+    // switch the selected heat-container
+    const allHeatContainers = document.querySelectorAll('.heat-container');
+    allHeatContainers.forEach(container => {
+        container.classList.remove('heat-selected');
+    });
+    element.classList.add('heat-selected');
+
+    // switch shown heat-content
+    allHeatContainers.forEach(container => {
+        const heatContent = container.querySelector('.heat-content');
+        heatContent.classList.add('hidden');
+    });
+    element.querySelector('.heat-content').classList.remove('hidden');
+
 }

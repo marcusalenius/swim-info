@@ -37,7 +37,7 @@ HEAT_ITEM_TEMPLATE = '''\
 '''
 
 HEAT_CONTENT_TEMPLATE = '''\
-<div class="heat-content">
+<div class="heat-content hidden">
   <div class="heat-column-headers">
     <p class="heat-column-header-lane pt12-gray3">Bana</p>
     <p class="heat-column-header-name pt12-gray3">Namn</p>
