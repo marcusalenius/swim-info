@@ -127,6 +127,7 @@ a {
     padding: 0px;
     width: fit-content;
     height: fit-content;
+    user-select: none;
 }
 
 .event-item {
@@ -136,10 +137,20 @@ a {
     width: 343px;
     height: 44px;
     border-radius: 10px;
+    cursor: pointer;
 }
 
 .event-item.event-selected {
     background-color: var(--element-blue);
+}
+
+.event-item:hover p {
+    color: var(--text-gray-3);
+    transition: color 50ms;
+}
+
+.event-item p {
+    transition: color 50ms;
 }
 
 .event-item-text {
@@ -151,7 +162,6 @@ a {
     width: 36px;
 }
 
-
 .heat-list {
     display: flex;
     flex-direction: column;
@@ -159,6 +169,25 @@ a {
     padding: 0px;
     width: fit-content;
     height: fit-content;
+    user-select: none;
+}
+
+.heat-container {
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.heat-container:hover .heat-item p {
+    color: var(--text-gray-3);
+    transition: color 50ms;
+}
+
+.heat-container .heat-item p {
+    transition: color 50ms;
+}
+
+.heat-container:has(.heat-content:hover) .heat-item  p {
+    color: initial;
 }
 
 .heat-item {
@@ -182,9 +211,11 @@ a {
     gap: 5px;
     width: fit-content;
     height: fit-content;
-    margin-left: 19px;
-    margin-top: 21px;
-    margin-bottom: 21px;
+    padding-left: 19px;
+    padding-top: 21px;
+    padding-bottom: 21px;
+    cursor: auto;
+    user-select: text;
 }
 
 .heat-column-headers {
@@ -208,6 +239,10 @@ a {
     width: fit-content;
     height: fit-content;
     border-bottom: 1px solid var(--line-gray);
+}
+
+.swimmer-container {
+    cursor: pointer;
 }
 
 .swimmer-item {
@@ -246,7 +281,6 @@ a {
     rotate: 180deg;
 }
 
-
 .swimmer-content {
     display: flex;
     flex-direction: column;
@@ -256,6 +290,7 @@ a {
     padding-right: 40px;
     padding-top: 6px;
     padding-bottom: 12px;
+    cursor: auto;
 }
 
 .swimmer-content-text {
