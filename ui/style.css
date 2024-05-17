@@ -365,6 +365,10 @@ a {
     border-bottom: 1px solid var(--line-gray);
 }
 
+.split-row:only-child {
+    border-bottom: none;
+}
+
 .split-row-col1 {
     width: 214px;
 }
