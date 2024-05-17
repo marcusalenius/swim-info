@@ -1,6 +1,6 @@
 '''
 The file contains the function is_correct_event, which is used to determine if
-a row text fis the correct event.
+a row text is the correct event.
 '''
 
 STROKE_TRANSLATIONS = {

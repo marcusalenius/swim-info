@@ -3,7 +3,7 @@ This file contains the function meet_names_match, which is used to match a meet
 name from Tempus to a meet name from LiveTiming, and its helper functions.
 '''
 import re
-from utilities import collapse_whitespace
+from retrieve_data.utilities import collapse_whitespace
 
 MEET_NAME_ABBREVIATIONS = {
     ('ungdoms', 'gp') : 'ugp',
@@ -68,4 +68,3 @@ def meet_names_match(name1: str, date1: str, name2: str, date2: str) -> bool:
     name1_tokens |= {year1}
     name2_tokens |= {year2}
     return name1_tokens == name2_tokens 
-

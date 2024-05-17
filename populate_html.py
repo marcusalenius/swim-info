@@ -3,10 +3,7 @@
 '''
 
 from bs4 import BeautifulSoup
-
 import json
-from pprint import pprint 
-
 
 EVENT_ITEM_TEMPLATE = '''\
 <div class="event-item">
@@ -91,7 +88,6 @@ SPLIT_ROW_TEMPLATE = '''\
 </div>
 
 '''
-# <p class="split-row-time pt14-gray1">1:06.02 <span class="last-50 pt14-gray3">(35.03)</span></p>
 
 
 

@@ -1,5 +1,38 @@
+'''
+This file contains utility and helper functions that are used in 
+retrieve_data.py and other supporting files.
+'''
 
+import time
 
+######################################################################
+# Utility functions for text processing
+######################################################################
+
+def collapse_whitespace(s: str) -> str:
+    '''
+    Collapses all whitespace characters in a string to a single space.
+    '''
+    result = ''
+    for i in range(len(s)):
+        if not s[i].isspace():
+            result += s[i]
+        # we already have a space as the last char in result
+        elif (result == '') or (not result[-1].isspace()):
+            result += ' '
+    return result
+
+def get_element_text(row) -> str:
+    '''
+    Gets the text of an element, in a nice format.
+    '''
+    return collapse_whitespace(row.get_text().replace('\xa0', ' ').strip())
+
+######################################################################
+# Helper functions for swims and splits
+######################################################################
+
+# Helper function for retrieving fastest_swim
 def convert_times_from_splits(non_none_splits: list[dict[str, str]]
                               ) -> list[tuple[int]]:
     '''
@@ -25,6 +58,7 @@ def convert_times_from_splits(non_none_splits: list[dict[str, str]]
         times_in_mins_secs_hundredths.append(three_item_times[0])
     return times_in_mins_secs_hundredths
 
+# Helper function for retrieving fastest_swim
 def get_fastest_swim_index(times: list[tuple[int]]) -> int:
     '''
     Returns the index of the fastest swim from a list of times. The times
@@ -98,3 +132,14 @@ def avg50(splits: dict[str, str]) -> str | None:
     avg_fifty = sum(fifty_times)/len(fifty_times)
     avg_fifty = round(avg_fifty, 2)
     return str(avg_fifty)
+
+######################################################################
+# Timing function
+######################################################################
+
+def time_function(func, *args):
+    start = time.time()
+    return_val = func(*args)
+    end = time.time()
+    print(f'Time taken: {end-start} seconds')
+    return return_val
