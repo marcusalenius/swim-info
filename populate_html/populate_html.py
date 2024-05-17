@@ -108,9 +108,14 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
         swimmer_content_soup.find(
             'div', class_='swimmer-content-text').p.string = (
                 f'{best_swim_info["meet_location"]}, {date}')
-        swimmer_content_soup.find('p', class_='avg50-time').string = (
-            best_swim_info['avg50'] if best_swim_info['avg50'] is not None
-                                    else 'N/A')
+        if best_swim_info['avg50'] is not None:
+            # add avg50 if it exists
+            swimmer_content_soup.find('p', class_='avg50-time').string = (
+                best_swim_info['avg50'])
+        else:
+            # otherwise remove the avg50 div
+            swimmer_content_soup.find('div', class_='swimmer-content-avg50'
+                                      ).decompose()
         add_splits(swimmer_content_soup, best_swim_info['splits'])
         swimmer_container_soup.find('div', class_='swimmer-container').append(
                 swimmer_content_soup)
