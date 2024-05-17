@@ -1,3 +1,5 @@
+console.log("script.js loaded");
+
 
 window.addEventListener('click', event => {
     const element = event.target;

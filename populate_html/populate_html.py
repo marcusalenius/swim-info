@@ -212,3 +212,5 @@ def populate_html(session_data: dict) -> None:
     # write to index.html
     with open('ui/index.html', 'w', encoding='utf-8') as file:
         file.write(str(page_soup))
+    
+    print('Application ready. Open ui/index.html with Live Server to view.')
