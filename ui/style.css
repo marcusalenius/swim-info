@@ -273,7 +273,6 @@ a {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-
 }
 
 .swimmer-item-text {
@@ -290,6 +289,11 @@ a {
 
 .swimmer-selected .swimmer-item-chevron {
     rotate: 180deg;
+    transition: rotate 300ms;
+}
+
+.swimmer-item-chevron {
+    transition: rotate 300ms;
 }
 
 .swimmer-content {
@@ -302,7 +306,6 @@ a {
     padding-top: 6px;
     padding-bottom: 12px;
     cursor: auto;
-
     transition: max-height 300ms ease-out; 
 }
 
@@ -310,7 +313,6 @@ a {
     max-height: 0px;
     padding-top: 0px;
     padding-bottom: 0px;
-
     transition: max-height 300ms ease-out, padding 50ms 240ms;
 }
 
