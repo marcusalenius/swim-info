@@ -40,7 +40,7 @@ function handleEventItemClick(element) {
     thisRightColumn.classList.remove('hidden');
 }
 
-function openHeatContent(element) {
+function getHeatContentHeight(element) {
     // get padding of heat-content
     const cssRules = document.styleSheets[0].cssRules;
     const heatContentIndex = Object.keys(cssRules).find(
@@ -50,15 +50,18 @@ function openHeatContent(element) {
     const padding = parseInt(paddingTop) + parseInt(paddingBottom);
     
     const heatContent = element.querySelector('.heat-content');
-    // console.log("opening - correct call:", heatContent.style.maxHeight === null);
     newHeight = parseInt(heatContent.scrollHeight) + padding;
-    heatContent.style.maxHeight = newHeight.toString() + "px";
+    return newHeight;
+}
+
+function openHeatContent(element) {
+    const heatContent = element.querySelector('.heat-content');
+    heatContent.style.maxHeight = getHeatContentHeight(element).toString() + 
+                                  "px";
 }
 
 function closeHeatContent(element) {
     const heatContent = element.querySelector('.heat-content');
-    // console.log("closing - correct call:", heatContent.style.maxHeight !== null);
-    // console.log(element.querySelector('p').innerHTML);
     heatContent.style.maxHeight = null;
 }
 
@@ -94,7 +97,7 @@ function handleHeatContainerClick(element) {
     }
 }
 
-function openSwimmerContent(element) {
+function getSwimmerContentHeight(element) {
     // get padding of swimmer-content
     const cssRules = document.styleSheets[0].cssRules;
     const swimmerContentIndex = Object.keys(cssRules).find(
@@ -105,12 +108,26 @@ function openSwimmerContent(element) {
 
     const swimmerContent = element.querySelector('.swimmer-content');
     newHeight = parseInt(swimmerContent.scrollHeight) + padding;
-    swimmerContent.style.maxHeight = newHeight.toString() + "px";
+    return newHeight;
+}
+
+function openSwimmerContent(element) {
+    const swimmerContent = element.querySelector('.swimmer-content');
+    swimmerContent.style.maxHeight = getSwimmerContentHeight(element)
+                                        .toString() + "px";
 }
 
 function closeSwimmerContent(element) {
     const swimmerContent = element.querySelector('.swimmer-content');
     swimmerContent.style.maxHeight = null;
+}
+
+function adjustHeatContentHeight(element, swimmerContentHeight) {
+    const heatContent = element.closest('.heat-content');
+    const heatContainer = heatContent.closest('.heat-container');
+    const newHeight = getHeatContentHeight(heatContainer) + 
+                      swimmerContentHeight;
+    heatContent.style.maxHeight = newHeight.toString() + "px";
 }
 
 function handleSwimmerContainerClick(element) {
@@ -128,6 +145,7 @@ function handleSwimmerContainerClick(element) {
     // show swimmer-content
     if (element.querySelector('.swimmer-content').classList.contains('hidden')) {
         openSwimmerContent(element);
+        adjustHeatContentHeight(element, getSwimmerContentHeight(element));
         element.querySelector('.swimmer-content').classList.remove('hidden');
     }
 }
