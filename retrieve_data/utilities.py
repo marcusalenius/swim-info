@@ -1,13 +1,13 @@
 '''
 This file contains utility and helper functions that are used in 
-retrieve_data.py and other supporting files.
+retrieve_data.py and other supporting data retrieval files.
 '''
 
 import time
 
-######################################################################
+###############################################################################
 # Utility functions for text processing
-######################################################################
+###############################################################################
 
 def collapse_whitespace(s: str) -> str:
     '''
@@ -28,9 +28,9 @@ def get_element_text(row) -> str:
     '''
     return collapse_whitespace(row.get_text().replace('\xa0', ' ').strip())
 
-######################################################################
+###############################################################################
 # Helper functions for swims and splits
-######################################################################
+###############################################################################
 
 # Helper function for retrieving fastest_swim
 def convert_times_from_splits(non_none_splits: list[dict[str, str]]
@@ -133,9 +133,9 @@ def avg50(splits: dict[str, str]) -> str | None:
     avg_fifty = round(avg_fifty, 2)
     return str(avg_fifty)
 
-######################################################################
+###############################################################################
 # Timing function
-######################################################################
+###############################################################################
 
 def time_function(func, *args):
     start = time.time()

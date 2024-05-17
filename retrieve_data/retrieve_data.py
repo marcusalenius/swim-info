@@ -89,7 +89,6 @@ get_splits_from_swim
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
-import json
 
 # helper functions
 from retrieve_data.utilities import (get_element_text,
@@ -117,7 +116,7 @@ from cache.meet_results_cache import (load_stored_meet_results_cache,
                                       add_meet_results_to_cache)
 
 
-######################################################################
+###############################################################################
 ### Debugging
 
 # Set DEBUG to True to print debug messages
@@ -126,12 +125,12 @@ DEBUG = False
 def debug_print(*args): 
     if DEBUG: print(*args)
 
-######################################################################
+###############################################################################
 
 
-######################################################################
+###############################################################################
 # Helper functions for get_best_swim_for_swimmer
-######################################################################
+###############################################################################
 
 def get_swimmer_id(swimmer_data: dict[str, str]) -> str | None:
     '''
@@ -232,9 +231,9 @@ def get_meet_id_and_location(name: str,
             return id, location
     return None, None
 
-######################################################################
+###############################################################################
 # Helper function for get_splits_from_meet
-######################################################################
+###############################################################################
 
 def get_meet_results(meet_id: str) -> list[str]:
     '''
@@ -259,9 +258,9 @@ def get_meet_results(meet_id: str) -> list[str]:
     add_meet_results_to_cache(meet_id, meet_results_row_texts)
     return meet_results_row_texts
 
-######################################################################
-# Main call chain (reversed)
-######################################################################
+###############################################################################
+# Main call chain (reverse order)
+###############################################################################
 
 def get_splits_from_swim(swim_row_texts: list[str]) -> dict[str, str]:
     '''
@@ -540,21 +539,21 @@ def get_meet_and_session_data(session_url: str, num_heats: int) -> dict:
 
 def retrieve_data(session_url: str, num_heats: int) -> dict:
     '''
+    The function called by main.py to retrieve session data. Returns a
+    dictionary with the meet name, session number, and the best swims for the
+    session. 
 
+    The time taken to retrieve the data is measured and printed.
     '''
     # load caches from files
     load_stored_swimmer_id_cache()
     load_stored_meet_id_and_location_cache()
     load_stored_meet_results_cache()
     session_data = time_function(get_meet_and_session_data,
-                                       session_url, num_heats)
-    # session_data = get_meet_and_session_data(session_url, num_heats)
+                                 session_url, num_heats)
     # save caches to files
     save_swimmer_id_cache()
     save_meet_id_and_location_cache()
     save_meet_results_cache()
 
-    # save output to json
-    with open('output.json', 'w', encoding='utf-8') as file:
-        json.dump(session_data, file, indent=4, sort_keys=True)
     return session_data

@@ -1,160 +1,36 @@
 '''
-
+This file contains the functions that populate index.html with the session
+data.
 '''
 
+# external libraries
 from bs4 import BeautifulSoup
 import json
 
-EVENT_ITEM_TEMPLATE = '''\
-<div class="event-item">
-  <div class="event-item-text">
-    <p class="event-item-number pt16"></p>
-    <p class="event-item-name pt16">1</p>
-  </div>
-</div>
-'''
+# templates
+from populate_html.html_snippet_templates import (EVENT_ITEM_TEMPLATE,
+                                                  RIGHT_COLUMN_TEMPLATE,
+                                                  HEAT_CONTAINER_TEMPLATE,
+                                                  HEAT_ITEM_TEMPLATE,
+                                                  HEAT_CONTENT_TEMPLATE,
+                                                  SWIMMER_CONTAINER_TEMPLATE,
+                                                  SWIMMER_ITEM_TEMPLATE,
+                                                  SWIMMER_CONTENT_TEMPLATE,
+                                                  SPLIT_ROW_TEMPLATE)
 
-RIGHT_COLUMN_TEMPLATE = '''\
-<div class="right-column hidden">
-  <h3></h3>
-  <div class="heat-list"></div>
-</div>
-'''
-
-HEAT_CONTAINER_TEMPLATE = '''\
-<div class="heat-container"></div>
-'''
-
-HEAT_ITEM_TEMPLATE = '''\
-<div class="heat-item">
-  <div class="heat-item-text">
-    <p class="pt16"></p>
-  </div>
-</div>  
-'''
-
-HEAT_CONTENT_TEMPLATE = '''\
-<div class="heat-content hidden">
-  <div class="heat-column-headers">
-    <p class="heat-column-header-lane pt12-gray3">Bana</p>
-    <p class="heat-column-header-name pt12-gray3">Namn</p>
-    <p class="heat-column-header-best pt12-gray3">Pers</p>
-  </div>
-  <div class="swimmer-list"></div>
-</div>
-'''
-
-SWIMMER_CONTAINER_TEMPLATE = '''\
-<div class="swimmer-container"></div>
-'''
-
-SWIMMER_ITEM_TEMPLATE = '''\
-<div class="swimmer-item">
-  <div class="swimmer-item-content">
-    <div class="swimmer-item-text">
-      <p class="swimmer-item-lane pt14-gray1"></p>
-      <p class="swimmer-item-name pt14-gray1"></p>
-      <p class="swimmer-item-best pt14-gray1"></p>
-    </div>
-    <img class="swimmer-item-chevron" src="images/chevron.svg" alt="chevron">
-  </div>
-</div>
-'''
-
-SWIMMER_CONTENT_TEMPLATE = '''\
-<div class="swimmer-content hidden">
-  <div class="swimmer-content-text">
-    <a target="_blank"></a>
-    <p class="pt12-gray2"></p>
-  </div>
-  <div class="swimmer-content-splits"></div>
-  <div class="swimmer-content-avg50">
-    <p class="pt12-gray3">Avg. 50m:</p>
-    <p class="avg50-time pt12-gray1"></p>
-  </div>
-</div>
-'''
-
-SPLIT_ROW_TEMPLATE = '''\
-<div class="split-row">
-  <div class="split-row-col split-row-col1">
-    <p class="split-row-distance pt14-gray3"></p>
-    <p class="split-row-time pt14-gray1"></p>
-  </div>
-  <div class="split-row-col split-row-col2">
-    <p class="split-row-distance pt14-gray3"></p>
-    <p class="split-row-time pt14-gray1"></p>
-  </div>
-</div>
-
-'''
+# helper functions
+from populate_html.utilities import format_date                                  
 
 
-
-
-MONTH_NAMES = {
-    '01': 'januari',
-    '02': 'februari',
-    '03': 'mars',
-    '04': 'april',
-    '05': 'maj',
-    '06': 'juni',
-    '07': 'juli',
-    '08': 'augusti',
-    '09': 'september',
-    '10': 'oktober',
-    '11': 'november',
-    '12': 'december'
-}
-
-
-def format_date(date: str) -> str:
-    '''
-    Formats the date from 'YYYY-MM-DD' to 'day month year'.
-    '''
-    year, month, day = date.split('-')
-    return f'{str(int(day))} {MONTH_NAMES[month]} {year}'
-
-
-
-
-def populate_page_title(page_soup, meet_name: str, session_number: str) -> None:
-    '''
-    Populates the h1 tag with the meet name and the h2 tag with the session 
-    number.
-    '''
-    page_soup.h1.string = meet_name
-    page_soup.h2.string = f'Pass {session_number}'
-
-def populate_event_menu(page_soup, events: dict) -> None:
-    '''
-    Populates the event menu with the events.
-    '''
-    # string version
-    for event_string in events.keys():
-        event_string = event_string[1:-1]
-        event_tokens = event_string.split(', ')
-        event_number = event_tokens[0]
-        event_name = event_tokens[1]
-
-        event_soup = BeautifulSoup(EVENT_ITEM_TEMPLATE, 'html.parser')
-        event_soup.find('div', class_='event-item')['id'] = (
-            f'event-item-{event_number}')
-        event_soup.find('p', class_='event-item-number').string = event_number
-        event_soup.find('p', class_='event-item-name').string = event_name
-
-        # add to page
-        page_soup.find('div', class_='event-menu').append(event_soup)
-
-
-
+###############################################################################
+# Helper functions for add_right_columns (reverse order)
+###############################################################################
 
 def add_splits(swimmer_content_soup, splits: dict) -> None:
     '''
-    
+    Adds 'split-row's to 'swimmer-content-splits'.
     '''
     splits_list = list(splits.items())
-    # make keys integers
     splits_list = [(int(key[:-1]), value) for key, value in splits_list]
     splits_list.sort(key=lambda key_value: key_value[0])
     for split_index in range(0, len(splits_list), 2):
@@ -180,13 +56,10 @@ def add_splits(swimmer_content_soup, splits: dict) -> None:
                     'html.parser')
                 col.find('p', class_='split-row-time').append(span_soup)
         
+        # add to swimmer content
         swimmer_content_soup.find('div', 
                                   class_='swimmer-content-splits').append(
                                         split_row_soup)
-
-
-        
-
 
 def add_swimmers(heat_content_soup, swimmers: dict) -> None:
     '''
@@ -248,7 +121,7 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
 
 def add_heats(right_column_soup, heats: dict) -> None:
     '''
-    Add 'heat-list' to 'right-column'.
+    Adds 'heat-list' to 'right-column'.
     '''
     heats = list(heats.items())
     heats.sort(key=lambda heat: int(heat[0]))
@@ -271,10 +144,40 @@ def add_heats(right_column_soup, heats: dict) -> None:
         right_column_soup.find('div', class_='heat-list').append(
             heat_container_soup)
 
+###############################################################################
+# Functions directly called by populate_html
+###############################################################################
+
+def populate_page_title(page_soup, meet_name: str, session_number: str) -> None:
+    '''
+    Populates the h1 tag with the meet name and the h2 tag with the session 
+    number.
+    '''
+    page_soup.h1.string = meet_name
+    page_soup.h2.string = f'Pass {session_number}'
+
+def populate_event_menu(page_soup, events: dict) -> None:
+    '''
+    Populates the event menu with the events.
+    '''
+    for event_string in events.keys():
+        event_string = event_string[1:-1]
+        event_tokens = event_string.split(', ')
+        event_number = event_tokens[0]
+        event_name = event_tokens[1]
+
+        event_soup = BeautifulSoup(EVENT_ITEM_TEMPLATE, 'html.parser')
+        event_soup.find('div', class_='event-item')['id'] = (
+            f'event-item-{event_number}')
+        event_soup.find('p', class_='event-item-number').string = event_number
+        event_soup.find('p', class_='event-item-name').string = event_name
+
+        # add to page
+        page_soup.find('div', class_='event-menu').append(event_soup)
 
 def add_right_columns(page_soup, events: dict) -> None:
     '''
-    
+    Adds right columns to the page, one for each event.
     '''
     for event_string, heats in events.items():
         event_string = event_string[1:-1]
@@ -289,19 +192,15 @@ def add_right_columns(page_soup, events: dict) -> None:
 
         add_heats(right_column_soup, heats)
 
-        
-        # if event_number == '4': # temporary
-            # add to page
+        # add to page
         page_soup.find('div', class_='two-columns').append(right_column_soup)
 
-
-        
-
-
+###############################################################################
 
 def populate_html(session_data: dict) -> None:
     '''
-    
+    The function called by main.py to populate index.html. Given the session 
+    data, populates index.html with the data.
     '''
     # get template from index_template.html
     with open('ui/index_template.html', 'r', encoding='utf-8') as file:
@@ -313,11 +212,3 @@ def populate_html(session_data: dict) -> None:
     # write to index.html
     with open('ui/index.html', 'w', encoding='utf-8') as file:
         file.write(str(page_soup))
-
-
-with open('output.json', 'r', encoding='utf-8') as file:
-    session_data = json.load(file)
-populate_html(session_data)
-
-
-
