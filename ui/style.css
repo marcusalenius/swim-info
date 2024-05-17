@@ -217,7 +217,6 @@ a {
     padding-bottom: 21px;
     cursor: auto;
     user-select: text;
-
     transition: max-height 300ms ease-out; 
 }
 
@@ -255,6 +254,20 @@ a {
     cursor: pointer;
     overflow: hidden;
 }
+
+.swimmer-container:hover .swimmer-item p {
+    color: var(--text-gray-3);
+    transition: color 50ms;
+}
+
+.swimmer-container .swimmer-item p {
+    transition: color 50ms;
+}
+
+.swimmer-container:has(.swimmer-content:hover) .swimmer-item  p {
+    color: initial;
+}
+
 
 .swimmer-item {
     display: flex;
