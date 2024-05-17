@@ -94,11 +94,31 @@ function handleHeatContainerClick(element) {
     }
 }
 
+function openSwimmerContent(element) {
+    // get padding of swimmer-content
+    const cssRules = document.styleSheets[0].cssRules;
+    const swimmerContentIndex = Object.keys(cssRules).find(
+        key => cssRules[key].selectorText === '.swimmer-content');
+    const paddingTop = cssRules[swimmerContentIndex].style.paddingTop;
+    const paddingBottom = cssRules[swimmerContentIndex].style.paddingBottom;
+    const padding = parseInt(paddingTop) + parseInt(paddingBottom);
+
+    const swimmerContent = element.querySelector('.swimmer-content');
+    newHeight = parseInt(swimmerContent.scrollHeight) + padding;
+    swimmerContent.style.maxHeight = newHeight.toString() + "px";
+}
+
+function closeSwimmerContent(element) {
+    const swimmerContent = element.querySelector('.swimmer-content');
+    swimmerContent.style.maxHeight = null;
+}
+
 function handleSwimmerContainerClick(element) {
     // clicked on the selected swimmer-container
     if (element.classList.contains('swimmer-selected')) {
         element.classList.remove('swimmer-selected');
         element.querySelector('.swimmer-content').classList.add('hidden');
+        closeSwimmerContent(element);
         return;
     }
 
@@ -106,5 +126,8 @@ function handleSwimmerContainerClick(element) {
     element.classList.add('swimmer-selected');
 
     // show swimmer-content
-    element.querySelector('.swimmer-content').classList.remove('hidden');
+    if (element.querySelector('.swimmer-content').classList.contains('hidden')) {
+        openSwimmerContent(element);
+        element.querySelector('.swimmer-content').classList.remove('hidden');
+    }
 }

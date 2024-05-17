@@ -104,10 +104,6 @@ a {
 }
 
 
-.hidden {
-    /* display: none !important; */
-}
-
 
 
 .two-columns {
@@ -160,6 +156,11 @@ a {
 
 .event-item-number {
     width: 36px;
+}
+
+
+.right-column.hidden {
+    display: none;
 }
 
 .heat-list {
@@ -217,9 +218,7 @@ a {
     cursor: auto;
     user-select: text;
 
-    overflow: hidden;
-    transition: max-height 900ms ease-out; 
-    /* 300ms */
+    transition: max-height 300ms ease-out; 
 }
 
 .heat-content.hidden {
@@ -227,7 +226,6 @@ a {
     padding-top: 0px;
     padding-bottom: 0px;
     transition: max-height 300ms ease-out, padding 50ms 240ms;
-    /* 300ms */
 }
 
 .heat-column-headers {
@@ -255,6 +253,7 @@ a {
 
 .swimmer-container {
     cursor: pointer;
+    overflow: hidden;
 }
 
 .swimmer-item {
@@ -303,6 +302,16 @@ a {
     padding-top: 6px;
     padding-bottom: 12px;
     cursor: auto;
+
+    transition: max-height 300ms ease-out; 
+}
+
+.swimmer-content.hidden {
+    max-height: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+
+    transition: max-height 300ms ease-out, padding 50ms 240ms;
 }
 
 .swimmer-content-text {
