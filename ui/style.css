@@ -105,7 +105,7 @@ a {
 
 
 .hidden {
-    display: none !important;
+    /* display: none !important; */
 }
 
 
@@ -216,6 +216,18 @@ a {
     padding-bottom: 21px;
     cursor: auto;
     user-select: text;
+
+    overflow: hidden;
+    transition: max-height 900ms ease-out; 
+    /* 300ms */
+}
+
+.heat-content.hidden {
+    max-height: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    transition: max-height 300ms ease-out, padding 50ms 240ms;
+    /* 300ms */
 }
 
 .heat-column-headers {

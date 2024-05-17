@@ -7,7 +7,7 @@ window.addEventListener('click', event => {
         handleHeatContainerClick(element);
     } else if (element.classList.contains('swimmer-container')) {
         handleSwimmerContainerClick(element);
-    }
+    } 
 });
 
 
@@ -40,11 +40,49 @@ function handleEventItemClick(element) {
     thisRightColumn.classList.remove('hidden');
 }
 
+function openHeatContent(element) {
+    // get padding of heat-content
+    const cssRules = document.styleSheets[0].cssRules;
+    const heatContentIndex = Object.keys(cssRules).find(
+        key => cssRules[key].selectorText === '.heat-content');
+    const paddingTop = cssRules[heatContentIndex].style.paddingTop;
+    const paddingBottom = cssRules[heatContentIndex].style.paddingBottom;
+    const padding = parseInt(paddingTop) + parseInt(paddingBottom);
+    
+    const heatContent = element.querySelector('.heat-content');
+    console.log("opening - correct call:", heatContent.style.maxHeight === null);
+    newHeight = parseInt(heatContent.scrollHeight) + padding;
+    heatContent.style.maxHeight = newHeight.toString() + "px";
+}
+
+function closeHeatContent(element) {
+    const heatContent = element.querySelector('.heat-content');
+    console.log("closing - correct call:", heatContent.style.maxHeight !== null);
+    console.log(element.querySelector('p').innerHTML);
+    heatContent.style.maxHeight = null;
+
+    // const cssRules = document.styleSheets[0].cssRules;
+    // const heatContentIndex = Object.keys(cssRules).find(
+    //     key => cssRules[key].selectorText === '.heat-content');
+    // const paddingTop = cssRules[heatContentIndex].style.paddingTop;
+    // const paddingBottom = cssRules[heatContentIndex].style.paddingBottom;
+    // const padding = parseInt(paddingTop) + parseInt(paddingBottom);
+
+    // const heatContent = element.querySelector('.heat-content');
+    // if (heatContent.style.maxHeight) {
+    //     heatContent.style.maxHeight = null;
+    // } else {
+    //     newHeight = parseInt(heatContent.scrollHeight) + padding;
+    //     heatContent.style.maxHeight = newHeight.toString() + "px";
+    // }
+}
+
 function handleHeatContainerClick(element) {
     // clicked on the selected heat-container
     if (element.classList.contains('heat-selected')) {
         element.classList.remove('heat-selected');
         element.querySelector('.heat-content').classList.add('hidden');
+        closeHeatContent(element);
         return;
     }
 
@@ -56,11 +94,22 @@ function handleHeatContainerClick(element) {
     element.classList.add('heat-selected');
 
     // switch shown heat-content
+    console.log("closing all other heat-content");
     allHeatContainers.forEach(container => {
         const heatContent = container.querySelector('.heat-content');
-        heatContent.classList.add('hidden');
+        if (!heatContent.classList.contains('hidden')) {
+            heatContent.classList.add('hidden');
+            closeHeatContent(container);    
+        }
     });
-    element.querySelector('.heat-content').classList.remove('hidden');
+    console.log("opening clicked heat-content");
+    if (element.querySelector('.heat-content').classList.contains('hidden')) {
+        openHeatContent(element);
+        element.querySelector('.heat-content').classList.remove('hidden');
+        
+    }
+    // element.querySelector('.heat-content').classList.remove('hidden');
+    // openHeatContent(element);
 }
 
 function handleSwimmerContainerClick(element) {
@@ -77,3 +126,29 @@ function handleSwimmerContainerClick(element) {
     // show swimmer-content
     element.querySelector('.swimmer-content').classList.remove('hidden');
 }
+
+
+
+// var acc = document.getElementsByClassName("heat-container");
+// var i;
+
+// // Object.keys(object).find(key => object[key] === value);
+// const cssRules = document.styleSheets[0].cssRules;
+// const heatContentIndex = Object.keys(cssRules).find(key => cssRules[key].selectorText === '.heat-content');
+// const paddingTop = cssRules[heatContentIndex].style.paddingTop;
+// const paddingBottom = cssRules[heatContentIndex].style.paddingBottom;
+// const padding = parseInt(paddingTop) + parseInt(paddingBottom);
+
+// for (i = 0; i < acc.length; i++) {
+//   acc[i].addEventListener("click", function() {
+//     var panel = this.querySelector('.heat-content');
+//     if (panel.style.maxHeight) {
+//       console.log("closing");
+//       panel.style.maxHeight = null;
+//     } else {
+//       console.log("opening");
+//       newHeight = parseInt(panel.scrollHeight) + padding;
+//       panel.style.maxHeight = newHeight.toString() + "px";
+//     } 
+//   });
+// }
