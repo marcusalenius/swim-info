@@ -181,10 +181,12 @@ def get_event_id(event_name: str, pool: str) -> str | None:
         return None
     return TEMPUS_EVENT_IDs[event_name_with_pool]
 
-def get_meet_name_and_date(swimmer_id: str, event_id: str) -> tuple[str, str]:
+def get_meet_name_and_date(swimmer_id: str, event_id: str
+                           ) -> tuple[str, str, str]:
     '''
     Gets the name and date of the meet where the swimmer swam their personal 
-    best. This function makes a GET request to Tempus.
+    best. This function makes a GET request to Tempus. It also return the time
+    of the swim as a backup time in case the LiveTiming results are not found.
     '''
     tempus_url = (f'https://www.tempusopen.se/index.php?r=swimmer/'
                   f'distance&id={swimmer_id}&event={event_id}')
@@ -194,7 +196,9 @@ def get_meet_name_and_date(swimmer_id: str, event_id: str) -> tuple[str, str]:
     first_row_tds = tempus_trs[1].find_all('td')
     name = get_element_text(first_row_tds[-1])
     date = get_element_text(first_row_tds[-2])
-    return name, date
+    backup_time = get_element_text(first_row_tds[0])
+    backup_time = backup_time.removeprefix('00:').removeprefix('0')
+    return name, date, backup_time
 
 def get_meet_id_and_location(name: str, 
                              date:str) -> tuple[str, str] | tuple[None, None]:
@@ -393,35 +397,55 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
             'splits': { '50': 'time', '100': 'time (last 50 time)', ... }
         }
     Called for each swimmer in a heat by get_best_swims_for_heat.
+
+    In case of an error, the returned dictionary looks like this:
+        {
+            'Error': 'error message',
+            [as many of the standard keys as possible]
+        }
     '''
+    # get the swimmer id (needed for the Tempus request)
     swimmer_id = get_swimmer_id(swimmer_data)
     if swimmer_id is None:
         return {'Error' : 'Error getting Tempus swimmer id. '
                           f'Swimmer name: {swimmer_data["name"]}.'}
-    # ensure that the event name is in the correct format
-    event_name = ' '.join(event_name.split(' ')[:2])
+    
+    # get the event id (needed for the Tempus request)
+    event_name = ' '.join(event_name.split(' ')[:2]) # ensure format is correct
     event_id = get_event_id(event_name, pool)
     if event_id is None:
         return {'Error' : 'Error getting Tempus event id. '
                           f'Event name: {event_name}, Pool: {pool}.'}
-    meet_name, meet_date = get_meet_name_and_date(swimmer_id, event_id)
-    meet_id, meet_location = get_meet_id_and_location(meet_name, meet_date)
-    if meet_id is None or meet_location is None:
-        return {'Error' : 'Error getting LiveTiming meet id and location. '
-                          f'Meet name: {meet_name}.'}
-    meet_year = int(meet_date[:4])
-    splits = get_splits_from_meet(meet_id, meet_year, swimmer_data, event_name)
-    if splits is None:
-        return {'Error' : 'Error getting splits from LiveTiming. '
-                          f'Meet name: {meet_name}. Meet id: {meet_id}.'}
-    result_url = (
-        f'https://www.livetiming.se/results.php?cid={meet_id}&session=0&all=1')
-    # assemble the best swim dictionary
+    
+    # get the meet name and date
+    meet_name, meet_date, backup_time = get_meet_name_and_date(swimmer_id, 
+                                                               event_id)
+    
     best_swim = dict()
     best_swim['meet_name'] = meet_name
     best_swim['meet_date'] = meet_date
-    best_swim['meet_location'] = meet_location
+    
+    # get the meet id and location
+    meet_id, meet_location = get_meet_id_and_location(meet_name, meet_date)
+    if meet_id is None or meet_location is None:
+        best_swim['Error'] = 'Error getting LiveTiming meet id and location.'
+        best_swim['final_time'] = backup_time
+        return best_swim
+
+    result_url = (
+        f'https://www.livetiming.se/results.php?cid={meet_id}&session=0&all=1')
     best_swim['result_url'] = result_url
+    best_swim['meet_location'] = meet_location
+
+    # get the splits
+    meet_year = int(meet_date[:4])
+    splits = get_splits_from_meet(meet_id, meet_year, swimmer_data, event_name)
+    if splits is None:
+        best_swim['Error'] = ('Error getting splits from LiveTiming. '
+                              f'Meet id: {meet_id}.')
+        best_swim['final_time'] = backup_time
+        return best_swim
+    
     best_swim['splits'] = splits
     best_swim['final_time'] = final_time(splits)
     best_swim['avg50'] = avg50(splits)
