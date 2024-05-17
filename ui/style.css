@@ -20,7 +20,7 @@ body {
 .container {
     margin-top: 50px;
     margin-left: 25px;
-    margin-bottom: 50px;
+    margin-bottom: 200px;
 }
 
 h1, h2, h3 {
@@ -215,16 +215,19 @@ a {
     padding-left: 19px;
     padding-top: 21px;
     padding-bottom: 21px;
+    padding-right: 19px;
     cursor: auto;
     user-select: text;
-    transition: max-height 300ms ease-out; 
+    opacity: 1;
+    transition: max-height 300ms ease-out, opacity 500ms; 
 }
 
 .heat-content.hidden {
+    opacity: 0;
     max-height: 0px;
     padding-top: 0px;
     padding-bottom: 0px;
-    transition: max-height 300ms ease-out, padding 50ms 240ms;
+    transition: max-height 300ms ease-out, opacity 500ms, padding-top 50ms 240ms;
 }
 
 .heat-column-headers {
@@ -319,14 +322,16 @@ a {
     padding-top: 6px;
     padding-bottom: 12px;
     cursor: auto;
-    transition: max-height 300ms ease-out; 
+    opacity: 1;
+    transition: max-height 200ms ease-out, opacity 300ms; ; 
 }
 
 .swimmer-content.hidden {
+    opacity: 0;
     max-height: 0px;
     padding-top: 0px;
     padding-bottom: 0px;
-    transition: max-height 300ms ease-out, padding 50ms 240ms;
+    transition: max-height 200ms ease-out, opacity 300ms, padding-top 30ms 140ms;
 }
 
 .swimmer-content-text {
