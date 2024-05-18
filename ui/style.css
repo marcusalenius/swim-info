@@ -2,6 +2,7 @@
     --text-gray-1: #37393C;
     --text-gray-2: #5B5F64;
     --text-gray-3: #7A7D81;
+    --text-gray-4: #929496;
     --element-blue: #E3EFFF;
     --element-gray: #EEF1F5;
     --line-gray: #D3D6DA;
@@ -73,6 +74,12 @@ p, a {
     color: var(--text-gray-3);
 }
 
+.pt14-gray4 {
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--text-gray-4);
+}
+
 .pt12-gray1 {
     font-size: 12px;
     line-height: 15px;
@@ -99,7 +106,9 @@ a {
 }
 
 
-.event-selected .pt16, .heat-selected .pt16, .swimmer-selected :not(.split-row-time).pt14-gray1 {
+.event-selected .pt16, .heat-selected .pt16, 
+.swimmer-selected :not(.split-row-time).pt14-gray1,
+.swimmer-selected :not(.split-row-time).pt14-gray4 {
     font-weight: 600;
 }
 
@@ -188,7 +197,7 @@ a {
 }
 
 .heat-container:has(.heat-content:hover) .heat-item  p {
-    color: initial;
+    color: var(--text-gray-1);
 }
 
 .heat-item {
@@ -267,8 +276,12 @@ a {
     transition: color 50ms;
 }
 
-.swimmer-container:has(.swimmer-content:hover) .swimmer-item  p {
-    color: initial;
+.swimmer-container:has(.swimmer-content:hover) .swimmer-item  p.pt14-gray1 {
+    color: var(--text-gray-1);
+}
+
+.swimmer-container:has(.swimmer-content:hover) .swimmer-item  p.pt14-gray4 {
+    color: var(--text-gray-4);
 }
 
 

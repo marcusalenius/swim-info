@@ -79,18 +79,23 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
         
         # add swimmer item
         swimmer_item_soup = BeautifulSoup(SWIMMER_ITEM_TEMPLATE, 'html.parser')
-        swimmer_item_soup.find('p', class_='swimmer-item-lane').string = (
-            lane_number)
-        swimmer_item_soup.find('p', class_='swimmer-item-name').string = (
-            swimmer_name)
-        
+        p_swimmer_item_lane = swimmer_item_soup.find('p',
+                                                     class_='swimmer-item-lane')
+        p_swimmer_item_lane.string = lane_number
+        p_swimmer_item_name = swimmer_item_soup.find('p',
+                                                     class_='swimmer-item-name')
+        p_swimmer_item_name.string = swimmer_name
+        p_swimmer_item_best = swimmer_item_soup.find('p', 
+                                                     class_='swimmer-item-best')
         if 'final_time' in best_swim_info:
-            swimmer_item_soup.find('p', class_='swimmer-item-best').string = (
-                best_swim_info['final_time'])
+            p_swimmer_item_best.string = best_swim_info['final_time']
         else:
-            swimmer_item_soup.find('p', class_='swimmer-item-best').string = (
-                'N/A')
-            
+            p_swimmer_item_best.string = 'N/A'
+        if 'Error' in best_swim_info:
+            p_swimmer_item_lane['class'] = 'swimmer-item-lane pt14-gray4'
+            p_swimmer_item_name['class'] = 'swimmer-item-name pt14-gray4'
+            p_swimmer_item_best['class'] = 'swimmer-item-best pt14-gray4'
+
         swimmer_container_soup.find('div', class_='swimmer-container').append(
                 swimmer_item_soup)
 
