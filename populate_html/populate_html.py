@@ -76,47 +76,60 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
 
         swimmer_container_soup = BeautifulSoup(SWIMMER_CONTAINER_TEMPLATE, 
                                                'html.parser')
+        
         # add swimmer item
         swimmer_item_soup = BeautifulSoup(SWIMMER_ITEM_TEMPLATE, 'html.parser')
         swimmer_item_soup.find('p', class_='swimmer-item-lane').string = (
             lane_number)
         swimmer_item_soup.find('p', class_='swimmer-item-name').string = (
             swimmer_name)
-        if 'Error' in best_swim_info:
-            swimmer_container_soup.find('div', 
-                                        class_='swimmer-container').append(
-                                            swimmer_item_soup)
-            swimmer_content_soup = BeautifulSoup(SWIMMER_CONTENT_TEMPLATE, 
-                                            'html.parser')
-            swimmer_container_soup.find('div', 
-                                        class_='swimmer-container').append(
-                                            swimmer_content_soup)
-            heat_content_soup.find('div', class_='swimmer-list').append(
-                swimmer_container_soup)
-            continue
-        swimmer_item_soup.find('p', class_='swimmer-item-best').string = (
-            best_swim_info['final_time'])
+        
+        if 'final_time' in best_swim_info:
+            swimmer_item_soup.find('p', class_='swimmer-item-best').string = (
+                best_swim_info['final_time'])
+        else:
+            swimmer_item_soup.find('p', class_='swimmer-item-best').string = (
+                'N/A')
+            
         swimmer_container_soup.find('div', class_='swimmer-container').append(
                 swimmer_item_soup)
 
         # add swimmer content
         swimmer_content_soup = BeautifulSoup(SWIMMER_CONTENT_TEMPLATE, 
                                             'html.parser')
-        swimmer_content_soup.a['href'] = best_swim_info['result_url']
-        swimmer_content_soup.a.string = best_swim_info['meet_name']
-        date = format_date(best_swim_info['meet_date'])
-        swimmer_content_soup.find(
-            'div', class_='swimmer-content-text').p.string = (
-                f'{best_swim_info["meet_location"]}, {date}')
-        if best_swim_info['avg50'] is not None:
-            # add avg50 if it exists
-            swimmer_content_soup.find('p', class_='avg50-time').string = (
-                best_swim_info['avg50'])
+        if 'result_url' in best_swim_info:
+            swimmer_content_soup.a['href'] = best_swim_info['result_url']
+        if 'meet_name' in best_swim_info:
+            swimmer_content_soup.a.string = best_swim_info['meet_name']
+        
+        if 'meet_date' in best_swim_info and 'meet_location' in best_swim_info:
+            date = format_date(best_swim_info['meet_date'])
+            swimmer_content_soup.find(
+                'div', class_='swimmer-content-text').p.string = (
+                    f'{best_swim_info["meet_location"]}, {date}')
+        elif 'meet_date' in best_swim_info:
+            date = format_date(best_swim_info['meet_date'])
+            swimmer_content_soup.find(
+                'div', class_='swimmer-content-text').p.string = date
+        elif 'meet_location' in best_swim_info:
+            swimmer_content_soup.find(
+                'div', class_='swimmer-content-text').p.string = (
+                    best_swim_info['meet_location'])
+        
+        if 'avg50' in best_swim_info:
+            if best_swim_info['avg50'] is not None:
+                swimmer_content_soup.find('p', class_='avg50-time').string = (
+                    best_swim_info['avg50'])
+            else:
+                swimmer_content_soup.find('div', class_='swimmer-content-avg50'
+                                          ).decompose()
         else:
-            # otherwise remove the avg50 div
             swimmer_content_soup.find('div', class_='swimmer-content-avg50'
                                       ).decompose()
-        add_splits(swimmer_content_soup, best_swim_info['splits'])
+                
+        if 'splits' in best_swim_info:
+            add_splits(swimmer_content_soup, best_swim_info['splits'])
+
         swimmer_container_soup.find('div', class_='swimmer-container').append(
                 swimmer_content_soup)
 
