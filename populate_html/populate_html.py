@@ -61,6 +61,16 @@ def add_splits(swimmer_content_soup, splits: dict) -> None:
                                   class_='swimmer-content-splits').append(
                                         split_row_soup)
 
+def add_error_message(swimmer_content_soup, best_swim_info: dict) -> None:
+    '''
+    Adds error message to 'swimmer-content-splits'.
+    '''
+    error_message = best_swim_info['Error']
+    error_message_soup = BeautifulSoup(
+        f'<p class="pt12-gray3">{error_message}</p>', 'html.parser')
+    swimmer_content_soup.find('div', class_='swimmer-content-splits').append(
+        error_message_soup)
+
 def add_swimmers(heat_content_soup, swimmers: dict) -> None:
     '''
     Adds 'swimmer-list' to 'heat-content'.
@@ -95,18 +105,25 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
             p_swimmer_item_lane['class'] = 'swimmer-item-lane pt14-gray4'
             p_swimmer_item_name['class'] = 'swimmer-item-name pt14-gray4'
             p_swimmer_item_best['class'] = 'swimmer-item-best pt14-gray4'
-
+        
         swimmer_container_soup.find('div', class_='swimmer-container').append(
                 swimmer_item_soup)
 
         # add swimmer content
         swimmer_content_soup = BeautifulSoup(SWIMMER_CONTENT_TEMPLATE, 
-                                            'html.parser')
-        if 'result_url' in best_swim_info:
-            swimmer_content_soup.a['href'] = best_swim_info['result_url']
-        if 'meet_name' in best_swim_info:
-            swimmer_content_soup.a.string = best_swim_info['meet_name']
+                                             'html.parser')
         
+        a_result = swimmer_content_soup.a
+        if 'meet_name' in best_swim_info and 'result_url' in best_swim_info:
+            a_result['href'] = best_swim_info['result_url']
+            a_result.string = best_swim_info['meet_name']
+        elif 'meet_name' in best_swim_info:
+            a_result.string = best_swim_info['meet_name']
+            a_result['class'] = 'inactive-link'
+        elif 'result_url' in best_swim_info:
+            a_result['href'] = best_swim_info['result_url']
+            a_result.string = best_swim_info['result_url']
+
         if 'meet_date' in best_swim_info and 'meet_location' in best_swim_info:
             date = format_date(best_swim_info['meet_date'])
             swimmer_content_soup.find(
@@ -134,6 +151,8 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
                 
         if 'splits' in best_swim_info:
             add_splits(swimmer_content_soup, best_swim_info['splits'])
+        else:
+            add_error_message(swimmer_content_soup, best_swim_info)
 
         swimmer_container_soup.find('div', class_='swimmer-container').append(
                 swimmer_content_soup)

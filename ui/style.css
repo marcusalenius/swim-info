@@ -105,6 +105,10 @@ a {
     color: var(--text-gray-1);
 }
 
+a.inactive-link {
+    text-decoration: none;
+}
+
 
 .event-selected .pt16, .heat-selected .pt16, 
 .swimmer-selected :not(.split-row-time).pt14-gray1,
