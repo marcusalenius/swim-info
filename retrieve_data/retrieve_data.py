@@ -449,6 +449,9 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
     best_swim['splits'] = splits
     best_swim['final_time'] = final_time(splits)
     best_swim['avg50'] = avg50(splits)
+    if 'medley' in event_name.lower():
+        best_swim['avg50'] = None
+
     return best_swim
 
 def get_best_swims_for_heat(heat_rows: list, event_name: str, pool: str
