@@ -83,14 +83,25 @@ def fastest_swim(all_splits: list[dict[str, str]]) -> dict[str, str] | None:
     fastest_swim_index = get_fastest_swim_index(times_in_mins_secs_hundredths)
     return all_splits[fastest_swim_index]
 
-def get_fifty_results(row_text: str) -> str:
+def get_fifty_results(row_text: str) -> str | None:
     '''
-    Returns the time of a 50m swim from the row text of a swim.
+    Returns the time of a 50m swim from the row text of a swim. If no 50m time
+    is found, returns None.
     '''
+    # Example row_text:
+    # 61 Joel Täljsten 2007 Sundsvalls Simsällskap 0.64 536 31.94 +4.91
+    # 2 Petter Lidén 2009 Sundsvalls Simsällskap +0.79 255 40.91 106,21 %
     row_tokens = row_text.split(' ')
-    if row_tokens[-1][0] == '+':
-        return row_tokens[-2]
-    return row_tokens[-1]
+    for i, token in enumerate(row_tokens):
+        if '.' not in token:
+            continue
+        if row_tokens[-1] == '%' and i == len(row_tokens) - 2:
+            continue
+        if '+' in token:
+            continue
+        if len(token.split('.')[0]) > 1:
+            return token    
+    return None
 
 def final_time(splits: dict[str, str]) -> str:
     '''

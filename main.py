@@ -8,7 +8,8 @@
 
 # The URL of the live timing session to retrieve data from.
 LIVETIMING_SESSION_URL = (
-    'https://www.livetiming.se/program.php?cid=8051&session=1')
+    # 'https://www.livetiming.se/program.php?cid=8051&session=1')
+    'https://www.livetiming.se/program.php?cid=8277&session=1')
 
 # Number of heats per event to get the best swim splits for. Set to 1 or above.
 NUM_HEATS = 2

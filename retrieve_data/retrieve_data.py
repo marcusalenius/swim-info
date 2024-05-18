@@ -182,7 +182,7 @@ def get_event_id(event_name: str, pool: str) -> str | None:
     return TEMPUS_EVENT_IDs[event_name_with_pool]
 
 def get_meet_name_and_date(swimmer_id: str, event_id: str
-                           ) -> tuple[str, str, str]:
+                           ) -> tuple[str, str, str] | None:
     '''
     Gets the name and date of the meet where the swimmer swam their personal 
     best. This function makes a GET request to Tempus. It also return the time
@@ -193,7 +193,11 @@ def get_meet_name_and_date(swimmer_id: str, event_id: str
     tempus_page = requests.get(tempus_url)
     tempus_soup = BeautifulSoup(tempus_page.content, 'html.parser')
     tempus_trs = tempus_soup.find_all('tr')
+    # empty page (swimmer has no times for the event)
+    if tempus_trs == []:
+        return None
     first_row_tds = tempus_trs[1].find_all('td')
+    # first_row_tds = tempus_trs[1].find_all('td')
     name = get_element_text(first_row_tds[-1])
     date = get_element_text(first_row_tds[-2])
     backup_time = get_element_text(first_row_tds[0])
@@ -284,13 +288,15 @@ def get_splits_from_swim(swim_row_texts: list[str]) -> dict[str, str]:
         row_tokens = row_text.split(' ')
         i = 0
         while i < len(row_tokens)-1:
-            if row_tokens[i] == '50m:':
+            if row_tokens[i] == '50m:' and row_tokens[i+1][0].isdigit():
                 splits['50m'] = row_tokens[i+1]
+                assert('Q' not in splits['50m'])
                 i += 2
             if (row_tokens[i][-1] == ':' and row_tokens[i][0].isdigit() and 
                 i+2 < len(row_tokens)):
                 # [:-1] to remove the colon
                 splits[row_tokens[i][:-1]] = ' '.join(row_tokens[i+1:i+3])
+                assert('Q' not in splits[row_tokens[i][:-1]])
                 i += 3
             else:
                 i += 1
@@ -377,6 +383,7 @@ def get_splits_from_meet(meet_id: str,
             curr_event_edition_row_texts.append(row_text)
     if all_splits == []:
         return None
+
     fastest_swim_splits = fastest_swim(all_splits)
     if '50m' not in fastest_swim_splits:
         return None
@@ -418,9 +425,11 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
                           f'Event name: {event_name}, Pool: {pool}.'}
     
     # get the meet name and date
-    meet_name, meet_date, backup_time = get_meet_name_and_date(swimmer_id, 
-                                                               event_id)
-    
+    return_val = get_meet_name_and_date(swimmer_id, event_id)
+    if return_val is None:
+        return {'Error' : 'First time swimming the event.'}
+    meet_name, meet_date, backup_time = return_val
+        
     best_swim = dict()
     best_swim['meet_name'] = meet_name
     best_swim['meet_date'] = meet_date
@@ -476,11 +485,11 @@ def get_best_swims_for_heat(heat_rows: list, event_name: str, pool: str
     return heat_best_swims
 
 def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
-                             ) -> tuple[str, dict]:
+                             ) -> tuple[str, dict] | None:
     '''
     Iterates through the heats in an event and gets the best swims for each 
     heat. Makes a GET request to LiveTiming. Called for each event in a session
-    by get_best_swims_for_session.
+    by get_best_swims_for_session. Returns None if the event is a relay.
     '''
     event_heat_list_page = requests.get(event_heat_list_url)
     event_soup = BeautifulSoup(event_heat_list_page.content, 'html.parser')
@@ -499,12 +508,21 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
         if row_text[:5] == 'Gren ':
             # new heat
             row_tokens = row_text.split(' ')
-            heat = row_tokens[-2]
+            if row_tokens[-1][1].isdigit():
+                heat = row_tokens[-2]
+            else:
+                heat = 1
             if event_name is None:
                 event_name = ' '.join(row_tokens[2:5])
+                # skip relays
+                if 'x' in event_name.lower():
+                    return None
             if total_heats is None:
-                total_heats = int(row_tokens[-1].replace('(', '')
-                                                .replace(')', ''))
+                if row_tokens[-1][1].isdigit():
+                    total_heats = int(row_tokens[-1].replace('(', '')
+                                                    .replace(')', ''))
+                else:
+                    total_heats = 1
             if (curr_heat is not None and 
                 int(curr_heat) > total_heats - num_heats):
                 # get best swims for the previous heat
@@ -540,8 +558,11 @@ def get_best_swims_for_session(session_soup, num_heats: int) -> dict:
             if get_element_text(td) == 'Heatlista':
                 link = td.find('a')['href']
                 event_heat_list_url = f'https://www.livetiming.se/{link}'
-                event_name, event_best_swims = get_best_swims_for_event(
-                    event_heat_list_url, num_heats)
+                return_val = get_best_swims_for_event(event_heat_list_url,
+                                                      num_heats)
+                if return_val is None: 
+                    continue
+                event_name, event_best_swims = return_val
                 session_best_swims[f'({event_number}, {event_name})'] = (
                     event_best_swims)
     return session_best_swims

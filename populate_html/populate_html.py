@@ -30,6 +30,9 @@ def add_splits(swimmer_content_soup, splits: dict) -> None:
     '''
     Adds 'split-row's to 'swimmer-content-splits'.
     '''
+    if len(splits) == 1:
+        # 50m swim
+        return
     splits_list = list(splits.items())
     splits_list = [(int(key[:-1]), value) for key, value in splits_list]
     splits_list.sort(key=lambda key_value: key_value[0])
