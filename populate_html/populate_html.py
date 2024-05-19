@@ -159,10 +159,10 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
         elif 'all_events_url' in best_swim_info:
             right_links_a[1]['href'] = best_swim_info['all_events_url']
             right_links_a[0].decompose()
+        else:
+            right_links_div.decompose()
 
         
-        # if get_element_text(content_text_div) == '':
-        #     content_text_div.decompose()
         
         if 'avg50' in best_swim_info:
             if best_swim_info['avg50'] is not None:
