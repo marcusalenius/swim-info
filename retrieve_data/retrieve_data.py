@@ -401,7 +401,9 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
             'result_url': 'url',
             'final_time': 'time',
             'avg50': 'time',
-            'splits': { '50': 'time', '100': 'time (last 50 time)', ... }
+            'splits': { '50': 'time', '100': 'time (last 50 time)', ... },
+            'all_times_url': 'url',
+            'all_events_url': 'url'
         }
     Called for each swimmer in a heat by get_best_swims_for_heat.
 
@@ -424,13 +426,22 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
         return {'Error' : 'Error getting Tempus event id. '
                           f'Event name: {event_name}, Pool: {pool}.'}
     
+    best_swim = dict()
+
+    # add the all times url and all events url
+    all_times_url = (f'https://www.tempusopen.se/index.php?r=swimmer/'
+                     f'distance&id={swimmer_id}&event={event_id}')
+    best_swim['all_times_url'] = all_times_url
+    all_events_url = (f'https://www.tempusopen.se/index.php?r=swimmer/'
+                      f'view&id={swimmer_id}')
+    best_swim['all_events_url'] = all_events_url
+
     # get the meet name and date
     return_val = get_meet_name_and_date(swimmer_id, event_id)
     if return_val is None:
         return {'Error' : 'First time swimming the event.'}
     meet_name, meet_date, backup_time = return_val
         
-    best_swim = dict()
     best_swim['meet_name'] = meet_name
     best_swim['meet_date'] = meet_date
     
