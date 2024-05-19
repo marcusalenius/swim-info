@@ -290,13 +290,11 @@ def get_splits_from_swim(swim_row_texts: list[str]) -> dict[str, str]:
         while i < len(row_tokens)-1:
             if row_tokens[i] == '50m:' and row_tokens[i+1][0].isdigit():
                 splits['50m'] = row_tokens[i+1]
-                assert('Q' not in splits['50m'])
                 i += 2
             if (row_tokens[i][-1] == ':' and row_tokens[i][0].isdigit() and 
                 i+2 < len(row_tokens)):
                 # [:-1] to remove the colon
                 splits[row_tokens[i][:-1]] = ' '.join(row_tokens[i+1:i+3])
-                assert('Q' not in splits[row_tokens[i][:-1]])
                 i += 3
             else:
                 i += 1
@@ -439,7 +437,8 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
     # get the meet name and date
     return_val = get_meet_name_and_date(swimmer_id, event_id)
     if return_val is None:
-        return {'Error' : 'First time swimming the event.'}
+        best_swim['Error'] = 'First time swimming the event.'
+        return best_swim
     meet_name, meet_date, backup_time = return_val
         
     best_swim['meet_name'] = meet_name
