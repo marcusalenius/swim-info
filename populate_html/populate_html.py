@@ -119,7 +119,10 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
         swimmer_content_soup = BeautifulSoup(SWIMMER_CONTENT_TEMPLATE, 
                                              'html.parser')
         
-        a_result = swimmer_content_soup.a
+        links_div = swimmer_content_soup.find('div', 
+                                              class_='swimmer-content-links')
+        a_result = links_div.a
+
         if 'meet_name' in best_swim_info and 'result_url' in best_swim_info:
             a_result['href'] = best_swim_info['result_url']
             a_result.string = best_swim_info['meet_name']
@@ -129,6 +132,8 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
         elif 'result_url' in best_swim_info:
             a_result['href'] = best_swim_info['result_url']
             a_result.string = best_swim_info['result_url']
+        else:
+            a_result.decompose()
         
         content_text_div = swimmer_content_soup.find(
             'div', class_='swimmer-content-text')
@@ -142,8 +147,22 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
         elif 'meet_location' in best_swim_info:
             content_text_div.p.string = (best_swim_info['meet_location'])
         
-        if get_element_text(content_text_div) == '':
-            content_text_div.decompose()
+        right_links_div = swimmer_content_soup.find('div', class_='right-links')
+        right_links_a = right_links_div.find_all('a')
+        if ('all_times_url' in best_swim_info and 
+            'all_events_url' in best_swim_info):
+            right_links_a[0]['href'] = best_swim_info['all_times_url']
+            right_links_a[1]['href'] = best_swim_info['all_events_url']
+        elif 'all_times_url' in best_swim_info:
+            right_links_a[0]['href'] = best_swim_info['all_times_url']
+            right_links_a[1].decompose()
+        elif 'all_events_url' in best_swim_info:
+            right_links_a[1]['href'] = best_swim_info['all_events_url']
+            right_links_a[0].decompose()
+
+        
+        # if get_element_text(content_text_div) == '':
+        #     content_text_div.decompose()
         
         if 'avg50' in best_swim_info:
             if best_swim_info['avg50'] is not None:

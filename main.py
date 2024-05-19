@@ -15,7 +15,7 @@ LIVETIMING_SESSION_URL = (
 NUM_HEATS = 2
 
 # Whether to retrieve new data or just populate the html with the existing data.
-RETRIEVE_NEW_DATA = True
+RETRIEVE_NEW_DATA = False
 
 ###############################################################################
 

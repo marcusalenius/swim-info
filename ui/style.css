@@ -68,6 +68,12 @@ p, a {
     color: var(--text-gray-1);
 }
 
+.pt14-gray2 {
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--text-gray-2);
+}
+
 .pt14-gray3 {
     font-size: 14px;
     line-height: 17px;
@@ -98,11 +104,18 @@ p, a {
     color: var(--text-gray-3);
 }
 
-a {
+.swimmer-content-links a {
     font-size: 14px;
     line-height: 17px;
     text-decoration: underline;
     color: var(--text-gray-1);
+}
+
+.right-links a {
+    font-size: 12px;
+    line-height: 15px;
+    text-decoration: underline;
+    color: var(--text-gray-2);
 }
 
 a.inactive-link {
@@ -356,6 +369,22 @@ a.inactive-link {
     flex-direction: column;
     align-items: flex-start;
     gap: 7px;
+    width: 100%;
+}
+
+.swimmer-content-links {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.right-links {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 12px;
 }
 
 .swimmer-content-avg50 {

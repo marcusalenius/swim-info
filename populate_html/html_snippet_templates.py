@@ -58,11 +58,31 @@ SWIMMER_ITEM_TEMPLATE = '''\
 </div>
 '''
 
+# SWIMMER_CONTENT_TEMPLATE = '''\
+# <div class="swimmer-content hidden">
+#   <div class="swimmer-content-text">
+#     <a target="_blank"></a>
+#     <p class="pt14-gray2"></p>
+#   </div>
+#   <div class="swimmer-content-splits"></div>
+#   <div class="swimmer-content-avg50">
+#     <p class="pt12-gray3">Avg. 50m:</p>
+#     <p class="avg50-time pt12-gray1"></p>
+#   </div>
+# </div>
+# '''
+
 SWIMMER_CONTENT_TEMPLATE = '''\
 <div class="swimmer-content hidden">
   <div class="swimmer-content-text">
-    <a target="_blank"></a>
-    <p class="pt12-gray2"></p>
+    <div class="swimmer-content-links">
+      <a target="_blank"></a>
+      <div class="right-links">
+        <a target="_blank">Alla Tider</a>
+        <a target="_blank">Alla Grenar</a>
+      </div>  
+    </div>
+    <p class="pt14-gray2"></p>
   </div>
   <div class="swimmer-content-splits"></div>
   <div class="swimmer-content-avg50">
