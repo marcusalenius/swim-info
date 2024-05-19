@@ -19,7 +19,8 @@ from populate_html.html_snippet_templates import (EVENT_ITEM_TEMPLATE,
                                                   SPLIT_ROW_TEMPLATE)
 
 # helper functions
-from populate_html.utilities import format_date                                  
+from populate_html.utilities import format_date        
+from retrieve_data.utilities import get_element_text                          
 
 
 ###############################################################################
@@ -102,8 +103,10 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
                                                      class_='swimmer-item-best')
         if 'final_time' in best_swim_info:
             p_swimmer_item_best.string = best_swim_info['final_time']
+        elif 'first time' in best_swim_info['Error'].lower():
+            p_swimmer_item_best.string = 'Första gången'
         else:
-            p_swimmer_item_best.string = 'N/A'
+            p_swimmer_item_best.string = 'Error'
         if 'Error' in best_swim_info:
             p_swimmer_item_lane['class'] = 'swimmer-item-lane pt14-gray4'
             p_swimmer_item_name['class'] = 'swimmer-item-name pt14-gray4'
@@ -126,20 +129,21 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
         elif 'result_url' in best_swim_info:
             a_result['href'] = best_swim_info['result_url']
             a_result.string = best_swim_info['result_url']
-
+        
+        content_text_div = swimmer_content_soup.find(
+            'div', class_='swimmer-content-text')
         if 'meet_date' in best_swim_info and 'meet_location' in best_swim_info:
             date = format_date(best_swim_info['meet_date'])
-            swimmer_content_soup.find(
-                'div', class_='swimmer-content-text').p.string = (
+            content_text_div.p.string = (
                     f'{best_swim_info["meet_location"]}, {date}')
         elif 'meet_date' in best_swim_info:
             date = format_date(best_swim_info['meet_date'])
-            swimmer_content_soup.find(
-                'div', class_='swimmer-content-text').p.string = date
+            content_text_div.p.string = date
         elif 'meet_location' in best_swim_info:
-            swimmer_content_soup.find(
-                'div', class_='swimmer-content-text').p.string = (
-                    best_swim_info['meet_location'])
+            content_text_div.p.string = (best_swim_info['meet_location'])
+        
+        if get_element_text(content_text_div) == '':
+            content_text_div.decompose()
         
         if 'avg50' in best_swim_info:
             if best_swim_info['avg50'] is not None:
