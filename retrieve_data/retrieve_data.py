@@ -325,7 +325,8 @@ def get_splits_from_event_edition(event_name: str,
         row_tokens = row_text.split(' ')
         if (
             # two names
-            (f'{row_tokens[1]} {row_tokens[2]}' == swimmer_data['name'] and
+            (len(row_tokens) >= 3 and
+             f'{row_tokens[1]} {row_tokens[2]}' == swimmer_data['name'] and
              row_tokens[3].isdigit() and 
              (row_tokens[3] == swimmer_data['born'] or 
               meet_year - int(row_tokens[3]) == int(swimmer_data['born']))) or
