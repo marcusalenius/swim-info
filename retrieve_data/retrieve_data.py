@@ -316,10 +316,21 @@ def get_splits_from_event_edition(event_name: str,
     for row_text in event_edition_row_texts:
         if row_text == '': continue
         row_tokens = row_text.split(' ')
-        if (f'{row_tokens[1]} {row_tokens[2]}' == swimmer_data['name']
-            and row_tokens[3].isdigit() and 
-            (row_tokens[3] == swimmer_data['born'] or 
-             meet_year - int(row_tokens[3]) == int(swimmer_data['born']))):
+        if (
+            # two names
+            (f'{row_tokens[1]} {row_tokens[2]}' == swimmer_data['name'] and
+             row_tokens[3].isdigit() and 
+             (row_tokens[3] == swimmer_data['born'] or 
+              meet_year - int(row_tokens[3]) == int(swimmer_data['born']))) or
+
+            # three names
+            (len(row_tokens) >= 4 and
+             (f'{row_tokens[1]} {row_tokens[2]} {row_tokens[3]}' == 
+                                                    swimmer_data['name']) and
+             row_tokens[4].isdigit() and 
+             (row_tokens[4] == swimmer_data['born'] or 
+              meet_year - int(row_tokens[4]) == int(swimmer_data['born'])))
+        ):
             if is_fifty_event:
                 return {'50m': get_fifty_results(row_text)}
             in_correct_swim = True
