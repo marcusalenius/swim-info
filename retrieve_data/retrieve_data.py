@@ -100,6 +100,7 @@ from retrieve_data.utilities import (get_element_text,
 from retrieve_data.meet_matcher import meet_names_match
 from retrieve_data.event_matcher import is_correct_event
 from retrieve_data.event_ids import TEMPUS_EVENT_IDs
+from progress_bar import ProgressBar
 
 # cache functions
 from cache.swimmer_id_cache import (load_stored_swimmer_id_cache, 
@@ -125,6 +126,12 @@ DEBUG = False
 def debug_print(*args): 
     if DEBUG: print(*args)
 
+###############################################################################
+
+
+###############################################################################
+### Initialize progress bar
+progress_bar = ProgressBar(bar_length=50)
 ###############################################################################
 
 
@@ -544,12 +551,16 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
                                                     .replace(')', ''))
                 else:
                     total_heats = 1
+                progress_bar.set_num_heats(min(total_heats, num_heats))
             if (curr_heat is not None and 
                 int(curr_heat) > total_heats - num_heats):
                 # get best swims for the previous heat
                 heat_best_swims = get_best_swims_for_heat(curr_heat_rows, 
                                                           event_name, pool)
                 event_best_swims[curr_heat] = heat_best_swims
+                progress_bar.update_heat(
+                    int(curr_heat) if num_heats >= total_heats
+                    else int(curr_heat) - (total_heats - num_heats))
             if curr_heat is not None:
                 curr_heat_rows = []
             curr_heat = heat
@@ -560,6 +571,8 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
     heat_best_swims = get_best_swims_for_heat(curr_heat_rows, event_name, 
                                               pool)
     event_best_swims[curr_heat] = heat_best_swims
+    progress_bar.update_heat(int(curr_heat) if num_heats >= total_heats
+                             else int(curr_heat) - (total_heats - num_heats))
     return event_name, event_best_swims
         
 def get_best_swims_for_session(session_soup, num_heats: int) -> dict:
@@ -586,6 +599,7 @@ def get_best_swims_for_session(session_soup, num_heats: int) -> dict:
                 event_name, event_best_swims = return_val
                 session_best_swims[f'({event_number}, {event_name})'] = (
                     event_best_swims)
+                progress_bar.update_event(int(event_number))
     return session_best_swims
 
 def get_meet_and_session_data(session_url: str, num_heats: int) -> dict:
@@ -596,6 +610,9 @@ def get_meet_and_session_data(session_url: str, num_heats: int) -> dict:
     '''
     session_page = requests.get(session_url)
     session_soup = BeautifulSoup(session_page.content, 'html.parser')
+    tbody = session_soup.find('tbody')
+    num_events = len(tbody.find_all('tr')) - 1
+    progress_bar.set_num_events(num_events)
     meet_name = ' '.join(get_element_text(session_soup.find('h1'))
                          .split(' ')[2:])
     session_number = session_url.split('=')[-1]
@@ -612,6 +629,9 @@ def retrieve_data(session_url: str, num_heats: int) -> dict:
     dictionary with the meet name, session number, and the best swims for the
     session. 
 
+    A progress bar is displayed while the data is being retrieved. The progress
+    bar is updated for each event and heat. 
+    
     The time taken to retrieve the data is measured and printed.
     '''
     # load caches from files
