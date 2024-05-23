@@ -21,7 +21,7 @@ body {
 .container {
     margin-top: 50px;
     margin-left: 25px;
-    margin-bottom: 200px;
+    height: 150vh;
 }
 
 h1, h2, h3 {
