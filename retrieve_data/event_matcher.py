@@ -16,6 +16,8 @@ def is_correct_event(row_text: str, event_name: str) -> bool:
     '''
     row_tokens = row_text.lower().split(' ')
     row_event_tokens = row_tokens[2:4]
+    if row_event_tokens[-1] == 'individual':
+        row_event_tokens = [row_tokens[2]] + [row_tokens[4]]
     name_event_tokens = event_name.lower().split(' ')
     if row_event_tokens == name_event_tokens:
         return True
