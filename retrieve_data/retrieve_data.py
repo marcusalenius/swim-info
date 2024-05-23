@@ -100,7 +100,7 @@ from retrieve_data.utilities import (get_element_text,
 from retrieve_data.meet_matcher import meet_names_match
 from retrieve_data.event_matcher import is_correct_event
 from retrieve_data.event_ids import TEMPUS_EVENT_IDs
-from progress_bar import ProgressBar
+from retrieve_data.progress_bar import ProgressBar
 
 # cache functions
 from cache.swimmer_id_cache import (load_stored_swimmer_id_cache, 
