@@ -139,8 +139,14 @@ def avg50(splits: dict[str, str]) -> str | None:
     fifty_times.sort(key=lambda key_value: key_value[0])
     # exclude the first and last 50m times
     fifty_times = fifty_times[1:-1]
-    fifty_times = [float(value) for _, value in fifty_times]
-    avg_fifty = sum(fifty_times)/len(fifty_times)
+    in_seconds = []
+    for _, value in fifty_times:
+        if ':' in value:
+            mins, secs = value.split(':')
+            in_seconds.append(int(mins)*60 + float(secs))
+        else:
+            in_seconds.append(float(value))  
+    avg_fifty = sum(in_seconds)/len(in_seconds)
     avg_fifty = round(avg_fifty, 2)
     return str(avg_fifty)
 
