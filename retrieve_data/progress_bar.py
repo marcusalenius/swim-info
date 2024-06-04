@@ -4,7 +4,7 @@ bar in the terminal.
 '''
 
 class ProgressBar:
-    def __init__(self, bar_length: int) -> None:
+    def __init__(self, bar_length: int, DEBUG: bool) -> None:
         '''
         Initializes a ProgressBar object with the given bar length. The bar
         length is the number of characters the bar will be displayed with. It 
@@ -17,6 +17,7 @@ class ProgressBar:
         self.curr_event = 0
         self.num_heats = None
         self.curr_heat = 0
+        self.DEBUG = DEBUG
         self._draw(0)
     
     def set_num_events(self, num_events: int) -> None:
@@ -67,6 +68,9 @@ class ProgressBar:
         filled_up_length = int(filled_up_length)
         bar = ("#" * filled_up_length + 
                "." * (self.bar_length - filled_up_length))
-        print(f'[{bar}] {percentage}%', end='\r')
+        if self.DEBUG:
+            print(f'[{bar}] {percentage}%', end='\n')
+        else:
+            print(f'[{bar}] {percentage}%', end='\r')
         if percentage == 100:
             print()

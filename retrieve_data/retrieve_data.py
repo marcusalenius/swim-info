@@ -121,7 +121,7 @@ from cache.meet_results_cache import (load_stored_meet_results_cache,
 ### Debugging
 
 # Set DEBUG to True to print debug messages
-DEBUG = False
+DEBUG = True
 
 def debug_print(*args): 
     if DEBUG: print(*args)
@@ -131,7 +131,7 @@ def debug_print(*args):
 
 ###############################################################################
 ### Initialize progress bar
-progress_bar = ProgressBar(bar_length=50)
+progress_bar = ProgressBar(bar_length=50, DEBUG=DEBUG)
 ###############################################################################
 
 
@@ -542,7 +542,6 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
     heat. Makes a GET request to LiveTiming. Called for each event in a session
     by get_best_swims_for_session. Returns None if the event is a relay.
     '''
-    #TODO: debug_print(f'event_heat_list_url: {event_heat_list_url}')
     event_heat_list_page = GET(event_heat_list_url)
     if event_heat_list_page is None:
         return None

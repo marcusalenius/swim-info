@@ -12,7 +12,9 @@ import time
 
 def GET(url: str) -> requests.models.Response | None:
     '''
-    
+    Performs a GET request to a URL and returns the response. If the status
+    code is not 200, prints an error message and returns None. If there is a
+    timeout, prints an error message and returns None.
     '''
     try:
         response = requests.get(url, timeout=15)
