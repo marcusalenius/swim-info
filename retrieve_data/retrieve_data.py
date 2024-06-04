@@ -195,7 +195,7 @@ def get_meet_name_and_date(swimmer_id: str, event_id: str
                            ) -> tuple[str, str, str] | None:
     '''
     Gets the name and date of the meet where the swimmer swam their personal 
-    best. This function makes a GET request to Tempus. It also return the time
+    best. This function makes a GET request to Tempus. It also returns the time
     of the swim as a backup time in case the LiveTiming results are not found.
     '''
     tempus_url = (f'https://www.tempusopen.se/index.php?r=swimmer/'
@@ -355,9 +355,12 @@ def get_splits_from_event_edition(event_name: str,
                 return {'50m': get_fifty_results(row_text)}
             in_correct_swim = True
             continue
+        if  (in_correct_swim and i == len(event_edition_row_texts)-1):
+            # last row
+            swim_row_texts.append(row_text)
+            return get_splits_from_swim(swim_row_texts)
         if (in_correct_swim and 
-            (row_tokens[0].isdigit() or row_tokens[0][0] == '=' or
-             i == len(event_edition_row_texts)-1)):
+            (row_tokens[0].isdigit() or row_tokens[0][0] == '=')):
             in_correct_swim = False
             if swim_row_texts != []:
                 return get_splits_from_swim(swim_row_texts)
@@ -503,7 +506,10 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
         return best_swim
     
     best_swim['splits'] = splits
-    best_swim['final_time'] = final_time(splits)
+    best_swim['final_time'] = backup_time
+    if backup_time != final_time(splits):
+        best_swim['Error'] = ('Final time does not match Tempus time.')
+        return best_swim
     best_swim['avg50'] = avg50(splits)
     if 'medley' in event_name.lower():
         best_swim['avg50'] = None
