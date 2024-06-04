@@ -10,7 +10,7 @@ import time
 # GET with error handling
 ###############################################################################
 
-def GET(url: str) -> requests.models.Response | None:
+def GET(url: str, debug: bool) -> requests.models.Response | None:
     '''
     Performs a GET request to a URL and returns the response. If the status
     code is not 200, prints an error message and returns None. If there is a
@@ -19,10 +19,10 @@ def GET(url: str) -> requests.models.Response | None:
     try:
         response = requests.get(url, timeout=15)
         if response.status_code != 200:
-            print(f'Status code {response.status_code} for {url}')
+            if debug: print(f'Status code {response.status_code} for {url}')
             return None
     except requests.exceptions.Timeout as e:
-        print(f'Timeout for {url}: {e}')
+        if debug: print(f'Timeout for {url}: {e}')
         return None
     return response
         
