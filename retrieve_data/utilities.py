@@ -26,7 +26,6 @@ def GET(url: str, debug: bool) -> requests.models.Response | None:
         return None
     return response
         
-
 ###############################################################################
 # Utility functions for text processing
 ###############################################################################
@@ -49,6 +48,19 @@ def get_element_text(row) -> str:
     Gets the text of an element, in a nice format.
     '''
     return collapse_whitespace(row.get_text().replace('\xa0', ' ').strip())
+
+###############################################################################
+# Modifying meet name with year
+###############################################################################
+
+def ensure_year_in_meet_name(name: str, date: str) -> str:
+    '''
+    Adds the year to the end of the meet name if it is not already there.
+    '''
+    year = date[:4]
+    if year not in name:
+        name += f' {year}'
+    return name
 
 ###############################################################################
 # Helper functions for swims and splits

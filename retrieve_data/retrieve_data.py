@@ -92,6 +92,7 @@ from urllib.parse import quote
 # helper functions
 from retrieve_data.utilities import (GET,
                                      get_element_text,
+                                     ensure_year_in_meet_name,
                                      fastest_swim,
                                      get_fifty_results,
                                      final_time,
@@ -226,7 +227,8 @@ def get_meet_id_and_location(name: str,
     the meet is found, its id and location are added to the cache and returned.
     If the meet is not found, None, None is returned.
     '''
-    cached_id_and_location = get_cached_meet_id_and_location(name)
+    name_with_year = ensure_year_in_meet_name(name, date)
+    cached_id_and_location = get_cached_meet_id_and_location(name_with_year)
     if cached_id_and_location is not None:
         return cached_id_and_location
     # note: 6444 is an arbitrary id and just used to get the page
@@ -244,12 +246,12 @@ def get_meet_id_and_location(name: str,
         meet_name = get_element_text(name_td)
         date_td = row_tds[3]
         meet_date = get_element_text(date_td)
-        if meet_names_match(name, date, meet_name, meet_date):
+        if meet_names_match(name_with_year, date, meet_name, meet_date):
             link = name_td.find('a')['href']
             id = link.split('=')[-1]
             location_td = row_tds[1]
             location = get_element_text(location_td)
-            add_meet_id_and_location_to_cache(name, id, location)
+            add_meet_id_and_location_to_cache(name_with_year, id, location)
             return id, location
     return None
 
