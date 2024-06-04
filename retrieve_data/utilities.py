@@ -3,7 +3,27 @@ This file contains utility and helper functions that are used in
 retrieve_data.py and other supporting data retrieval files.
 '''
 
+import requests
 import time
+
+###############################################################################
+# GET with error handling
+###############################################################################
+
+def GET(url: str) -> requests.models.Response | None:
+    '''
+    
+    '''
+    try:
+        response = requests.get(url, timeout=15)
+        if response.status_code != 200:
+            print(f'Status code {response.status_code} for {url}')
+            return None
+    except requests.exceptions.Timeout as e:
+        print(f'Timeout for {url}: {e}')
+        return None
+    return response
+        
 
 ###############################################################################
 # Utility functions for text processing

@@ -86,12 +86,12 @@ get_splits_from_swim
 '''
 
 # external libraries
-import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 
 # helper functions
-from retrieve_data.utilities import (get_element_text,
+from retrieve_data.utilities import (GET,
+                                     get_element_text,
                                      fastest_swim,
                                      get_fifty_results,
                                      final_time,
@@ -152,9 +152,10 @@ def get_swimmer_id(swimmer_data: dict[str, str]) -> str | None:
     '''
     cached_id = get_cached_swimmer_id(swimmer_data)
     if cached_id is not None:
-        debug_print('Used cached swimmer id.')
+        debug_print(f'Used cached swimmer id for {swimmer_data["name"]}.')
         return cached_id
-    debug_print('Making GET request to Tempus for swimmer id.')
+    debug_print(f'Making GET request to Tempus for swimmer id for '
+                f'{swimmer_data["name"]}.')
     first_name = quote(swimmer_data['name'].split(' ')[0])
     last_name = quote(' '.join(swimmer_data['name'].split(' ')[1:]))
     club = quote(swimmer_data['club'])
@@ -166,7 +167,9 @@ def get_swimmer_id(swimmer_data: dict[str, str]) -> str | None:
                 f'&Swimmer%5Bclass%5D=99'
                 f'&Swimmer%5Bis_active%5D=1'
                 f'&ajax=swimmer-grid')
-    response = requests.get(form_url)
+    response = GET(form_url)
+    if response is None:
+        return None
     response_soup = BeautifulSoup(response.content, 'html.parser')
     first_row = response_soup.find_all('tr')[1]
     first_row_text = get_element_text(first_row)
@@ -197,7 +200,9 @@ def get_meet_name_and_date(swimmer_id: str, event_id: str
     '''
     tempus_url = (f'https://www.tempusopen.se/index.php?r=swimmer/'
                   f'distance&id={swimmer_id}&event={event_id}')
-    tempus_page = requests.get(tempus_url)
+    tempus_page = GET(tempus_url)
+    if tempus_page is None:
+        return None
     tempus_soup = BeautifulSoup(tempus_page.content, 'html.parser')
     tempus_trs = tempus_soup.find_all('tr')
     # empty page (swimmer has no times for the event)
@@ -228,7 +233,9 @@ def get_meet_id_and_location(name: str,
     debug_print('Making GET request to LiveTiming for meet id and location.')
     # note: 6444 is an arbitrary id and just used to get the page
     livetiming_url = 'https://www.livetiming.se/archive.php?cid=6644'
-    livetiming_page = requests.get(livetiming_url)
+    livetiming_page = GET(livetiming_url)
+    if livetiming_page is None:
+        return None, None
     livetiming_soup = BeautifulSoup(livetiming_page.content, 'html.parser')
     livetiming_trs = livetiming_soup.find_all('tr')
     for row in livetiming_trs[1:]:
@@ -250,7 +257,7 @@ def get_meet_id_and_location(name: str,
 # Helper function for get_splits_from_meet
 ###############################################################################
 
-def get_meet_results(meet_id: str) -> list[str]:
+def get_meet_results(meet_id: str) -> list[str] | None:
     '''
     Returns the table row texts of the results of a meet. If the meet is in the
     cache, its results are returned immediately. Otherwise, a GET request is
@@ -264,7 +271,9 @@ def get_meet_results(meet_id: str) -> list[str]:
     debug_print('Making GET request to LiveTiming for meet results.')
     meet_results_url = (f'https://www.livetiming.se/results.php?'
                         f'cid={meet_id}&session=0&all=1')
-    meet_results_page = requests.get(meet_results_url)
+    meet_results_page = GET(meet_results_url)
+    if meet_results_page is None:
+        return None
     meet_results_soup = BeautifulSoup(meet_results_page.content, 'html.parser')
     meet_results_trs = meet_results_soup.find_all('tr')
     meet_results_row_texts = [get_element_text(row) 
@@ -340,6 +349,9 @@ def get_splits_from_event_edition(event_name: str,
               meet_year - int(row_tokens[4]) == int(swimmer_data['born'])))
         ):
             if is_fifty_event:
+                fifty_result = get_fifty_results(row_text)
+                if fifty_result is None:
+                    return None
                 return {'50m': get_fifty_results(row_text)}
             in_correct_swim = True
             continue
@@ -369,6 +381,8 @@ def get_splits_from_meet(meet_id: str,
     Called once by get_best_swim_for_swimmer.
     '''
     meet_results_row_texts = get_meet_results(meet_id)
+    if meet_results_row_texts is None:
+        return None
     all_splits = []
     curr_event_edition_row_texts = []
     in_correct_event = False
@@ -501,14 +515,22 @@ def get_best_swims_for_heat(heat_rows: list, event_name: str, pool: str
     heat_best_swims = dict()
     for row in heat_rows:
         row_text = get_element_text(row)
-        if ((len(row_text) <= 2) or (not row_text[0].isdigit()) or 
-            (not row_text[1].isspace())): continue
-        lane = row_text[0]
+        if (len(row_text) <= 2) or (not row_text[0].isdigit()): continue
         tds = row.find_all('td')
+        # debug_print(f'row_text: {row_text}')
+        element_texts = [get_element_text(td) for td in tds]
+        element_texts = [text for text in element_texts if text != '']
+        if len(element_texts) <= 3: continue # safety
+        element_texts = (element_texts[1:] if element_texts[2][0].isalpha() 
+                         else element_texts)
+        lane = element_texts[0]
         swimmer_data = dict()
-        swimmer_data['name'] = get_element_text(tds[3])
-        swimmer_data['born'] = get_element_text(tds[4])
-        swimmer_data['club'] = get_element_text(tds[5])
+        swimmer_data['name'] = element_texts[1]
+        swimmer_data['born'] = element_texts[2]
+        club = element_texts[3]
+        club = ' '.join([word.title() if len(word) > 2 else word 
+                        for word in club.split(' ')])
+        swimmer_data['club'] = club
         heat_best_swims[f'({lane}, {swimmer_data["name"]})'] = (
             get_best_swim_for_swimmer(swimmer_data, event_name, pool))
     return heat_best_swims
@@ -520,7 +542,10 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
     heat. Makes a GET request to LiveTiming. Called for each event in a session
     by get_best_swims_for_session. Returns None if the event is a relay.
     '''
-    event_heat_list_page = requests.get(event_heat_list_url)
+    #TODO: debug_print(f'event_heat_list_url: {event_heat_list_url}')
+    event_heat_list_page = GET(event_heat_list_url)
+    if event_heat_list_page is None:
+        return None
     event_soup = BeautifulSoup(event_heat_list_page.content, 'html.parser')
     event_trs = event_soup.find_all('tr')
     event_name = None
@@ -609,7 +634,9 @@ def get_meet_and_session_data(session_url: str, num_heats: int) -> dict:
     for the session. Called once by retrieve_data. Makes a GET request to 
     LiveTiming.
     '''
-    session_page = requests.get(session_url)
+    session_page = GET(session_url)
+    if session_page is None:
+        return {'Error' : 'Error getting session page.'}
     session_soup = BeautifulSoup(session_page.content, 'html.parser')
     tbody = session_soup.find('tbody')
     num_events = len(tbody.find_all('tr')) - 1
