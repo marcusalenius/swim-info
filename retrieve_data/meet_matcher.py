@@ -22,6 +22,20 @@ MEET_NAME_REMOVABLE_TOKENS = {
     'simarena', 'simarenan', 'simbassäng', 'simbassängen', '&'
 }
 
+# copy-paste the key from the UI and add year to it and copy-paste the value 
+# from LiveTiming
+HARDCODED_NAMES = {
+    'JSM/Sum-Sim äldre & Sum-Sim 16 år 2021' : 
+        'JSM/Sum-Sim äldre & Sum-Sim 16 år (50m)'  
+}
+
+def hardcoded_name(name: str) -> str:
+    '''
+    Returns the hardcoded name for the given name if it exists, otherwise
+    returns the name unchanged.
+    '''
+    return HARDCODED_NAMES.get(name, name)
+
 def clean_meet_name(name: str) -> str:
     '''
     Cleans a meet name by removing unnecessary characters and adding spaces
@@ -51,6 +65,7 @@ def meet_names_match(name1: str, date1: str, name2: str, date2: str) -> bool:
     same meet. This function is used to match a meet name from Tempus to a meet 
     name from LiveTiming.
     '''
+    name1, name2 = hardcoded_name(name1), hardcoded_name(name2)
     name1, name2 = name1.lower(), name2.lower()
     if name1 == name2: return True
     name1, name2 = clean_meet_name(name1), clean_meet_name(name2)
