@@ -11,7 +11,7 @@ LIVETIMING_SESSION_URL = (
     'https://www.livetiming.se/program.php?cid=7082&session=1')
 
 # Number of heats per event to get the best swim splits for. Set to 1 or above.
-NUM_HEATS = 100
+NUM_HEATS = 2
 
 # Whether to retrieve new data or just populate the html with the existing data.
 RETRIEVE_NEW_DATA = True

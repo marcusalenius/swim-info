@@ -13,6 +13,7 @@ class ProgressBar:
         '''
         assert bar_length > 0, 'Bar length must be greater than 0.'
         self.bar_length = bar_length
+        self.start_event = 0
         self.num_events = None
         self.curr_event = 0
         self.num_heats = None
@@ -29,12 +30,13 @@ class ProgressBar:
     
     def update_event(self, event: int) -> None:
         '''
-        Updates the current event number. The event number must be greater than
-        0 and less than or equal to the number of events.
+        Updates the current event number.
         '''
-        assert 0 < event <= self.num_events, 'Event number must be in range.'
-        self.curr_event = event
+        self.curr_event += 1
         self.curr_heat = 1
+        filled_up_length = self.bar_length * (self.curr_event / 
+                                              self.num_events)
+        self._draw(filled_up_length)
 
     def set_num_heats(self, num_heats: int) -> None:
         '''

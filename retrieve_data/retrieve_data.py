@@ -573,9 +573,10 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
                 heat = 1
             if event_name is None:
                 event_name = ' '.join(row_tokens[2:5])
-                # skip relays
-                if ('x' in event_name.lower() and 
-                    'mixed' not in event_name.lower()):
+                # skip relays and extralopp
+                if (('x' in event_name.lower() and 
+                    'mixed' not in event_name.lower()) or 
+                    'extralopp' in event_name.lower()):
                     return None
             if total_heats is None:
                 if row_tokens[-1][1].isdigit():
@@ -635,7 +636,8 @@ def get_best_swims_for_session(session_soup, num_heats: int) -> dict:
                 event_name, event_best_swims = return_val
                 session_best_swims[f'({event_number}, {event_name})'] = (
                     event_best_swims)
-                progress_bar.update_event(int(event_number))
+        progress_bar.update_event(int(event_number))
+        
     return session_best_swims
 
 def get_meet_and_session_data(session_url: str, num_heats: int) -> dict:
