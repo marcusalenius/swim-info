@@ -329,7 +329,7 @@ def get_splits_from_event_edition(event_name: str,
     is_fifty_event = '50m ' in event_name
     swim_row_texts = []
     in_correct_swim = False
-    for row_text in event_edition_row_texts:
+    for i, row_text in enumerate(event_edition_row_texts):
         if row_text == '': continue
         row_tokens = row_text.split(' ')
         if (
@@ -356,7 +356,8 @@ def get_splits_from_event_edition(event_name: str,
             in_correct_swim = True
             continue
         if (in_correct_swim and 
-            (row_tokens[0].isdigit() or row_tokens[0][0] == '=')):
+            (row_tokens[0].isdigit() or row_tokens[0][0] == '=' or
+             i == len(event_edition_row_texts)-1)):
             in_correct_swim = False
             if swim_row_texts != []:
                 return get_splits_from_swim(swim_row_texts)
@@ -604,6 +605,8 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
     # get best swims for the last heat
     heat_best_swims = get_best_swims_for_heat(curr_heat_rows, event_name, 
                                               pool)
+    if curr_heat is None or total_heats is None:
+        return None
     event_best_swims[curr_heat] = heat_best_swims
     progress_bar.update_heat(int(curr_heat) if num_heats >= total_heats
                              else int(curr_heat) - (total_heats - num_heats))
