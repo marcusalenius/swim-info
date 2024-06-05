@@ -19,7 +19,6 @@ RETRIEVE_NEW_DATA = True
 ###############################################################################
 
 import json
-
 from retrieve_data.retrieve_data import retrieve_data
 from populate_html.populate_html import populate_html
 
