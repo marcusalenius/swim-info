@@ -192,5 +192,8 @@ def time_function(func, *args):
     start = time.time()
     return_val = func(*args)
     end = time.time()
-    print(f'Time taken: {end-start} seconds')
+    elapsed_time = end - start
+    minutes = int(elapsed_time // 60)
+    seconds = int(elapsed_time % 60)
+    print(f'Time taken: {minutes} minutes {seconds} seconds')
     return return_val
