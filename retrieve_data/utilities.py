@@ -195,5 +195,8 @@ def time_function(func, *args):
     elapsed_time = end - start
     minutes = int(elapsed_time // 60)
     seconds = int(elapsed_time % 60)
-    print(f'Time taken: {minutes} minutes {seconds} seconds')
+    if minutes == 0:
+        print(f'Time taken: {seconds} seconds')
+    else:
+        print(f'Time taken: {minutes} minutes and {seconds} seconds')
     return return_val
