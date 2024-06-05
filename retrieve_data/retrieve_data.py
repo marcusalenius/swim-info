@@ -392,7 +392,7 @@ def get_splits_from_event_edition(event_name: str,
             (row_tokens[0].isdigit() or row_tokens[0][0] == '=')) or
 
             # Format: name born club
-            (in_correct_swim and row_tokens[0].isalpha() and 
+            (in_correct_swim and row_tokens[0].replace('-', '').isalpha() and 
              row_tokens[0].lower() != 'entry')
         ):
             in_correct_swim = False
@@ -401,6 +401,9 @@ def get_splits_from_event_edition(event_name: str,
             continue
         if in_correct_swim:
             swim_row_texts.append(row_text)
+            # if swimmer_data['name'] == 'Elma Skoglund' and 'bröst' in event_name.lower():
+            #     print(row_text)
+            #     input('STOPPED')
     return None
 
 def get_splits_from_meet(meet_id: str, 
@@ -545,6 +548,10 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
     
     best_swim['final_time'] = backup_time
     if backup_time != final_time(splits):
+        # if swimmer_data['name'] == 'Elma Skoglund':
+        #     print(f'backup_time: {backup_time}')
+        #     print(f'final_time: {final_time(splits)}')
+        #     input('STOPPED')
         best_swim['Error'] = ('Final time does not match Tempus time.')
         return best_swim
 
@@ -574,7 +581,7 @@ def get_best_swims_for_heat(heat_rows: list, event_name: str, pool: str
                          else element_texts)
         lane = element_texts[0]
         swimmer_data = dict()
-        swimmer_data['name'] = element_texts[1]
+        swimmer_data['name'] = element_texts[1].title()
         swimmer_data['born'] = element_texts[2]
         club = element_texts[3]
         club = ' '.join([word.title() if len(word) > 2 else word 
@@ -613,19 +620,18 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
         if row_text[:5] == 'Gren ':
             # new heat
             row_tokens = row_text.split(' ')
-            if row_tokens[-1][1].isdigit():
+            if len(row_tokens[-1]) >= 2 and row_tokens[-1][1].isdigit():
                 heat = row_tokens[-2]
             else:
                 heat = 1
             if event_name is None:
                 event_name = ' '.join(row_tokens[2:5])
                 # skip relays and extralopp
-                if (('x' in event_name.lower() and 
-                    'mixed' not in event_name.lower()) or 
+                if ('4x' in event_name.lower() or 
                     'extralopp' in event_name.lower()):
                     return None
             if total_heats is None:
-                if row_tokens[-1][1].isdigit():
+                if len(row_tokens[-1]) >= 2 and row_tokens[-1][1].isdigit():
                     total_heats = int(row_tokens[-1].replace('(', '')
                                                     .replace(')', ''))
                 else:
@@ -671,8 +677,7 @@ def get_best_swims_for_session(session_soup, num_heats: int) -> dict:
     for row in session_trs[1:]:
         tds = row.find_all('td')
         event_number = get_element_text(tds[0])
-        debug_print(f'  Event number: {event_number} of '
-                    f'{progress_bar.num_events}')
+        debug_print(f'  Event number: {event_number}')
         for td in tds:
             if get_element_text(td) == 'Heatlista':
                 link = td.find('a')['href']
