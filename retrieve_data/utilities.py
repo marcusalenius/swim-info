@@ -131,7 +131,7 @@ def get_fifty_results(row_text: str) -> str | None:
             continue
         if row_tokens[-1] == '%' and i == len(row_tokens) - 2:
             continue
-        if '+' in token:
+        if '+' in token or '-' in token:
             continue
         if len(token.split('.')[0]) > 1:
             return token    

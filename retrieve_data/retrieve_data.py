@@ -334,9 +334,6 @@ def get_splits_from_event_edition(event_name: str,
     in_correct_swim = False
     for i, row_text in enumerate(event_edition_row_texts):
         if row_text == '': continue
-        # if swimmer_data['name'] == 'Arvid Larsson': 
-        #     print(row_text)
-        #     input('STOPPED')
         row_tokens = row_text.split(' ')
         
         if (
