@@ -26,7 +26,17 @@ MEET_NAME_REMOVABLE_TOKENS = {
 # from LiveTiming
 HARDCODED_NAMES = {
     'JSM/Sum-Sim äldre & Sum-Sim 16 år 2021' : 
-        'JSM/Sum-Sim äldre & Sum-Sim 16 år (50m)'  
+        'JSM/Sum-Sim äldre & Sum-Sim 16 år (50m)',
+    'Eskilstuna Sprint (25m) 2023' : 
+        'UGP 2 2023 (50m), Eskilstuna & Eskilstuna-Sprint',
+    'Zoggs Zwim Stockholm - Summer Cup 2023' : 
+        'Zoggs Zwim - Summer Cup',
+    'HEAD Summer Cup 2021' :
+        'Polisen Head Summer Cup',
+    'Eskilstuna Sprint 2022' :
+        'UGP 2 2022 med Eskilstuna Sprint',
+    'DM-JDM (50m) 2022 Eskilstuna' :
+        'DM-JDM (50m) 2022 Mellansvenska'
 }
 
 def hardcoded_name(name: str) -> str:
