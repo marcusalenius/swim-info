@@ -340,6 +340,7 @@ a.inactive-link {
 
 .swimmer-item-chevron {
     transition: rotate 300ms;
+    user-select: none;
 }
 
 .swimmer-content {
