@@ -392,7 +392,8 @@ def get_splits_from_event_edition(event_name: str,
             (row_tokens[0].isdigit() or row_tokens[0][0] == '=')) or
 
             # Format: name born club
-            (in_correct_swim and row_tokens[0].isalpha())
+            (in_correct_swim and row_tokens[0].isalpha() and 
+             row_tokens[0].lower() != 'entry')
         ):
             in_correct_swim = False
             if swim_row_texts != []:
@@ -452,6 +453,7 @@ def get_splits_from_meet(meet_id: str,
             continue
         if in_correct_event and in_swimmer_rows:
             curr_event_edition_row_texts.append(row_text)
+
     if all_splits == []:
         return None
 
@@ -541,11 +543,12 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
         best_swim['final_time'] = backup_time
         return best_swim
     
-    best_swim['splits'] = splits
     best_swim['final_time'] = backup_time
     if backup_time != final_time(splits):
         best_swim['Error'] = ('Final time does not match Tempus time.')
         return best_swim
+
+    best_swim['splits'] = splits
     best_swim['avg50'] = avg50(splits)
     if 'medley' in event_name.lower():
         best_swim['avg50'] = None
