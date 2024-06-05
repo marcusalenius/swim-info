@@ -88,6 +88,7 @@ get_splits_from_swim
 # external libraries
 from bs4 import BeautifulSoup
 from urllib.parse import quote
+import re
 
 # helper functions
 from retrieve_data.utilities import (GET,
@@ -333,22 +334,49 @@ def get_splits_from_event_edition(event_name: str,
     in_correct_swim = False
     for i, row_text in enumerate(event_edition_row_texts):
         if row_text == '': continue
+        # if swimmer_data['name'] == 'Arvid Larsson': 
+        #     print(row_text)
+        #     input('STOPPED')
         row_tokens = row_text.split(' ')
+        
         if (
+            # Format: rank name born club
+            (
             # two names
             (len(row_tokens) >= 3 and
-             f'{row_tokens[1]} {row_tokens[2]}' == swimmer_data['name'] and
+             (f'{row_tokens[1]} {row_tokens[2]}'.lower() == 
+                swimmer_data['name'].lower()) and
              row_tokens[3].isdigit() and 
              (row_tokens[3] == swimmer_data['born'] or 
               meet_year - int(row_tokens[3]) == int(swimmer_data['born']))) or
 
             # three names
             (len(row_tokens) >= 4 and
-             (f'{row_tokens[1]} {row_tokens[2]} {row_tokens[3]}' == 
-                                                    swimmer_data['name']) and
+             (f'{row_tokens[1]} {row_tokens[2]} {row_tokens[3]}'.lower() == 
+                swimmer_data['name'].lower()) and
              row_tokens[4].isdigit() and 
              (row_tokens[4] == swimmer_data['born'] or 
               meet_year - int(row_tokens[4]) == int(swimmer_data['born'])))
+            ) or
+            
+            # Format: name born club
+            (
+            # two names
+            (len(row_tokens) >= 2 and
+             (f'{row_tokens[0]} {row_tokens[1]}'.lower() == 
+                swimmer_data['name'].lower()) and
+             row_tokens[2].isdigit() and
+             (row_tokens[2] == swimmer_data['born'] or
+              meet_year - int(row_tokens[2]) == int(swimmer_data['born']))) or
+
+            # three names
+            (len(row_tokens) >= 3 and
+             (f'{row_tokens[0]} {row_tokens[1]} {row_tokens[2]}'.lower() ==
+                swimmer_data['name'].lower()) and
+             row_tokens[3].isdigit() and
+             (row_tokens[3] == swimmer_data['born'] or
+              meet_year - int(row_tokens[3]) == int(swimmer_data['born'])))
+            )
         ):
             if is_fifty_event:
                 fifty_result = get_fifty_results(row_text)
@@ -361,8 +389,14 @@ def get_splits_from_event_edition(event_name: str,
             # last row
             swim_row_texts.append(row_text)
             return get_splits_from_swim(swim_row_texts)
-        if (in_correct_swim and 
-            (row_tokens[0].isdigit() or row_tokens[0][0] == '=')):
+        if (
+            # Format: rank name born club
+            (in_correct_swim and 
+            (row_tokens[0].isdigit() or row_tokens[0][0] == '=')) or
+
+            # Format: name born club
+            (in_correct_swim and row_tokens[0].isalpha())
+        ):
             in_correct_swim = False
             if swim_row_texts != []:
                 return get_splits_from_swim(swim_row_texts)
@@ -400,12 +434,15 @@ def get_splits_from_meet(meet_id: str,
             in_correct_event = True
             continue
         if ((in_correct_event) and 
-            (row_text[:10] == 'Plac Namn ' or row_text[:10] == 'Rank Name ')):
+            (row_text[:10] == 'Plac Namn ' or row_text[:10] == 'Rank Name ' or
+             row_text[:5] == 'Namn ' or row_text[:5] == 'Name ')):
             in_swimmer_rows = True
             continue
         if (in_correct_event and in_swimmer_rows and 
             (row_text[:16] == 'Grenen officiell' or 
-             row_text[:14] == 'Event official')):
+             row_text[:14] == 'Event official' or
+             # only date, no 'grenen officiell'
+             re.search(r'\d{4}-\d{2}-\d{2}', row_text[:10]) is not None)):
             in_correct_event = False
             in_swimmer_rows = False
             if curr_event_edition_row_texts != []:
