@@ -401,9 +401,6 @@ def get_splits_from_event_edition(event_name: str,
             continue
         if in_correct_swim:
             swim_row_texts.append(row_text)
-            # if swimmer_data['name'] == 'Elma Skoglund' and 'bröst' in event_name.lower():
-            #     print(row_text)
-            #     input('STOPPED')
     return None
 
 def get_splits_from_meet(meet_id: str, 
@@ -523,12 +520,12 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
         
     best_swim['meet_name'] = meet_name
     best_swim['meet_date'] = meet_date
-    
+    best_swim['final_time'] = backup_time
+
     # get the meet id and location
     return_val = get_meet_id_and_location(meet_name, meet_date)
     if return_val is None:
         best_swim['Error'] = 'Error getting LiveTiming meet id and location.'
-        best_swim['final_time'] = backup_time
         return best_swim
     meet_id, meet_location = return_val
 
@@ -543,16 +540,10 @@ def get_best_swim_for_swimmer(swimmer_data: dict[str, str], event_name: str,
     if splits is None:
         best_swim['Error'] = ('Error getting splits from LiveTiming. '
                               f'Meet id: {meet_id}.')
-        best_swim['final_time'] = backup_time
         return best_swim
     
-    best_swim['final_time'] = backup_time
     if backup_time != final_time(splits):
-        # if swimmer_data['name'] == 'Elma Skoglund':
-        #     print(f'backup_time: {backup_time}')
-        #     print(f'final_time: {final_time(splits)}')
-        #     input('STOPPED')
-        best_swim['Error'] = ('Final time does not match Tempus time.')
+        best_swim['Error'] = 'Final time does not match Tempus time.'
         return best_swim
 
     best_swim['splits'] = splits
@@ -596,7 +587,8 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
     '''
     Iterates through the heats in an event and gets the best swims for each 
     heat. Makes a GET request to LiveTiming. Called for each event in a session
-    by get_best_swims_for_session. Returns None if the event is a relay.
+    by get_best_swims_for_session. Returns None if the event is a relay or the
+    GET request fails.
     '''
     debug_print('  Getting best swims for event...')
     event_heat_list_page = GET(event_heat_list_url, debug=DEBUG)
@@ -617,8 +609,8 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
         if row_text == '': continue
         if row_text[:9] == 'Bassäng: ':
             pool = row_text[9:12]
+        # new heat
         if row_text[:5] == 'Gren ':
-            # new heat
             row_tokens = row_text.split(' ')
             if len(row_tokens[-1]) >= 2 and row_tokens[-1][1].isdigit():
                 heat = row_tokens[-2]
@@ -639,7 +631,7 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
                 progress_bar.set_num_heats(min(total_heats, num_heats))
             if (curr_heat is not None and 
                 int(curr_heat) > total_heats - num_heats):
-                # get best swims for the previous heat
+                # get best swims for current heat
                 heat_best_swims = get_best_swims_for_heat(curr_heat_rows, 
                                                           event_name, pool)
                 event_best_swims[curr_heat] = heat_best_swims
@@ -666,10 +658,10 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
 def get_best_swims_for_session(session_soup, num_heats: int) -> dict:
     '''
     Iterates through the events in a session and gets the best swims for each
-    event. Returns a dictionary where the keys are event names and the values
-    are dictionaries where the keys are lane numbers and swimmer names, and the
-    values are dictionaries with their best swims. Called once by 
-    get_meet_and_session_data.
+    event. Returns a dictionary where the keys are event numbers and names and 
+    the values are dictionaries where the keys are lane numbers and swimmer
+    names, and the values are dictionaries with their best swims. Called once 
+    by get_meet_and_session_data.
     '''
     debug_print('Getting best swims for session...')
     session_trs = session_soup.find_all('tr')

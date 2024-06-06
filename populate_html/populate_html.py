@@ -5,7 +5,6 @@ data.
 
 # external libraries
 from bs4 import BeautifulSoup
-import json
 
 # templates
 from populate_html.html_snippet_templates import (EVENT_ITEM_TEMPLATE,
@@ -20,7 +19,6 @@ from populate_html.html_snippet_templates import (EVENT_ITEM_TEMPLATE,
 
 # helper functions
 from populate_html.utilities import format_date        
-from retrieve_data.utilities import get_element_text                          
 
 
 ###############################################################################

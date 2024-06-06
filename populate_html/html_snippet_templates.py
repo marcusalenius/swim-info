@@ -1,5 +1,5 @@
 '''
-
+This file contains the HTML snippet templates used to populate the HTML file.
 '''
 
 EVENT_ITEM_TEMPLATE = '''\
@@ -57,20 +57,6 @@ SWIMMER_ITEM_TEMPLATE = '''\
   </div>
 </div>
 '''
-
-# SWIMMER_CONTENT_TEMPLATE = '''\
-# <div class="swimmer-content hidden">
-#   <div class="swimmer-content-text">
-#     <a target="_blank"></a>
-#     <p class="pt14-gray2"></p>
-#   </div>
-#   <div class="swimmer-content-splits"></div>
-#   <div class="swimmer-content-avg50">
-#     <p class="pt12-gray3">Avg. 50m:</p>
-#     <p class="avg50-time pt12-gray1"></p>
-#   </div>
-# </div>
-# '''
 
 SWIMMER_CONTENT_TEMPLATE = '''\
 <div class="swimmer-content hidden">

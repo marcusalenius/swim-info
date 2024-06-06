@@ -1,5 +1,5 @@
 '''
-
+This file is to be run to run the script. Edit the constants as needed.
 '''
 
 ###############################################################################
@@ -8,7 +8,7 @@
 
 # The URL of the live timing session to retrieve data from.
 LIVETIMING_SESSION_URL = (
-    'https://www.livetiming.se/program.php?cid=7082&session=2')
+    'https://www.livetiming.se/program.php?cid=7082&session=4')
 
 # Number of heats per event to get the best swim splits for. Set to 1 or above.
 NUM_HEATS = 100
