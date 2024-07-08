@@ -94,6 +94,8 @@ import re
 from retrieve_data.utilities import (GET,
                                      get_element_text,
                                      ensure_year_in_meet_name,
+                                     time_to_mins_secs_hundredths,
+                                     get_fastest_swim_index,
                                      fastest_swim,
                                      get_fifty_results,
                                      final_time,
@@ -578,8 +580,33 @@ def get_best_swims_for_heat(heat_rows: list, event_name: str, pool: str
         club = ' '.join([word.title() if len(word) > 2 else word 
                         for word in club.split(' ')])
         swimmer_data['club'] = club
-        heat_best_swims[f'({lane}, {swimmer_data["name"]})'] = (
-            get_best_swim_for_swimmer(swimmer_data, event_name, pool))
+        current_pool_best_swim = get_best_swim_for_swimmer(swimmer_data, 
+                                                           event_name, pool)
+        other_pool = '50m' if pool == '25m' else '25m'
+        other_pool_best_swim = get_best_swim_for_swimmer(swimmer_data,
+                                                         event_name, 
+                                                         other_pool)
+        if ('final_time' in current_pool_best_swim and 
+            'final_time' in other_pool_best_swim):
+            # if other pool is faster, also provide it
+            both_times = [current_pool_best_swim['final_time'], 
+                          other_pool_best_swim['final_time']]
+            both_times = [time_to_mins_secs_hundredths(time) 
+                          for time in both_times]
+            fastest_swim_index = get_fastest_swim_index(both_times)
+            if fastest_swim_index == 1:
+                heat_best_swims[f'({lane}, {swimmer_data["name"]})'] = {
+                    pool: current_pool_best_swim,
+                    other_pool: other_pool_best_swim
+                }
+            else:
+                heat_best_swims[f'({lane}, {swimmer_data["name"]})'] = {
+                    pool: other_pool_best_swim,
+                }
+        else:
+            heat_best_swims[f'({lane}, {swimmer_data["name"]})'] = {
+                pool: other_pool_best_swim,
+            }
     return heat_best_swims
 
 def get_best_swims_for_event(event_heat_list_url: str, num_heats: int

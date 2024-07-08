@@ -66,6 +66,18 @@ def ensure_year_in_meet_name(name: str, date: str) -> str:
 # Helper functions for swims and splits
 ###############################################################################
 
+def time_to_mins_secs_hundredths(time: str) -> tuple[int]:
+    '''
+    Converts a time string in the format 'm:ss.hh' to a tuple of minutes,
+    seconds, and hundredths of a second.
+    '''
+    separated_time = time.replace(':', '.').split('.')
+    separated_time_int = list(map(int, separated_time))
+    three_item_times = (tuple([0] + separated_time_int) 
+                        if len(separated_time_int) == 2 
+                        else tuple(separated_time_int))
+    return three_item_times
+
 # Helper function for retrieving fastest_swim
 def convert_times_from_splits(non_none_splits: list[dict[str, str]]
                               ) -> list[tuple[int]]:
