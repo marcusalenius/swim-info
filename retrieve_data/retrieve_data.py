@@ -680,7 +680,7 @@ def get_best_swims_for_event(event_heat_list_url: str, num_heats: int
     event_best_swims[curr_heat] = heat_best_swims
     progress_bar.update_heat(int(curr_heat) if num_heats >= total_heats
                              else int(curr_heat) - (total_heats - num_heats))
-    return event_name, event_best_swims
+    return event_name, event_best_swims, pool
         
 def get_best_swims_for_session(session_soup, num_heats: int) -> dict:
     '''
@@ -705,12 +705,12 @@ def get_best_swims_for_session(session_soup, num_heats: int) -> dict:
                                                       num_heats)
                 if return_val is None: 
                     continue
-                event_name, event_best_swims = return_val
+                event_name, event_best_swims, pool = return_val
                 session_best_swims[f'({event_number}, {event_name})'] = (
                     event_best_swims)
         progress_bar.update_event(int(event_number))
         
-    return session_best_swims
+    return session_best_swims, pool
 
 def get_meet_and_session_data(session_url: str, num_heats: int) -> dict:
     '''
@@ -729,11 +729,12 @@ def get_meet_and_session_data(session_url: str, num_heats: int) -> dict:
     meet_name = ' '.join(get_element_text(session_soup.find('h1'))
                          .split(' ')[2:])
     session_number = session_url.split('=')[-1]
-    session_best_swims = get_best_swims_for_session(session_soup, num_heats)
+    session_best_swims, pool = get_best_swims_for_session(session_soup, num_heats)
     session_data = dict()
     session_data['meet_name'] = meet_name
     session_data['session_number'] = session_number
     session_data['events'] = session_best_swims
+    session_data['pool'] = pool
     return session_data
 
 def retrieve_data(session_url: str, num_heats: int) -> dict:

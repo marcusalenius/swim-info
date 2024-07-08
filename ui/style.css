@@ -122,6 +122,14 @@ a.inactive-link {
     text-decoration: none;
 }
 
+p.pool-header {
+    font-weight: 600;
+}
+
+p.pool-header:not(:first-child) {
+    margin-top: 10px;
+}
+
 
 .event-selected .pt16, .heat-selected .pt16, 
 .swimmer-selected :not(.split-row-time).pt14-gray1,

@@ -73,7 +73,7 @@ def add_error_message(swimmer_content_soup, best_swim_info: dict) -> None:
     swimmer_content_soup.find('div', class_='swimmer-content-splits').append(
         error_message_soup)
 
-def add_swimmers(heat_content_soup, swimmers: dict) -> None:
+def add_swimmers(heat_content_soup, swimmers: dict, pool: str) -> None:
     '''
     Adds 'swimmer-list' to 'heat-content'.
     '''
@@ -185,7 +185,7 @@ def add_swimmers(heat_content_soup, swimmers: dict) -> None:
         heat_content_soup.find('div', class_='swimmer-list').append(
             swimmer_container_soup)
 
-def add_heats(right_column_soup, heats: dict) -> None:
+def add_heats(right_column_soup, heats: dict, pool: str) -> None:
     '''
     Adds 'heat-list' to 'right-column'.
     '''
@@ -203,7 +203,7 @@ def add_heats(right_column_soup, heats: dict) -> None:
         heat_container_div.append(heat_item_soup)
         # add heat content
         heat_content_soup = BeautifulSoup(HEAT_CONTENT_TEMPLATE, 'html.parser')
-        add_swimmers(heat_content_soup, swimmers)
+        add_swimmers(heat_content_soup, swimmers, pool)
         heat_container_div.append(heat_content_soup)
 
         # add to right column
@@ -241,7 +241,7 @@ def populate_event_menu(page_soup, events: dict) -> None:
         # add to page
         page_soup.find('div', class_='event-menu').append(event_soup)
 
-def add_right_columns(page_soup, events: dict) -> None:
+def add_right_columns(page_soup, events: dict, pool: str) -> None:
     '''
     Adds right columns to the page, one for each event.
     '''
@@ -256,7 +256,7 @@ def add_right_columns(page_soup, events: dict) -> None:
             f'right-column-{event_number}')
         right_column_soup.h3.string = f'Gren {event_number}, {event_name}'
 
-        add_heats(right_column_soup, heats)
+        add_heats(right_column_soup, heats, pool)
 
         # add to page
         page_soup.find('div', class_='two-columns').append(right_column_soup)
@@ -274,7 +274,7 @@ def populate_html(session_data: dict) -> None:
     populate_page_title(page_soup, session_data['meet_name'], 
                         session_data['session_number'])
     populate_event_menu(page_soup, session_data['events'])
-    add_right_columns(page_soup, session_data['events'])
+    add_right_columns(page_soup, session_data['events'], session_data['pool'])
     # write to index.html
     with open('ui/index.html', 'w', encoding='utf-8') as file:
         file.write(str(page_soup))
