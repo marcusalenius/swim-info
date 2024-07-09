@@ -42,7 +42,13 @@ HARDCODED_NAMES = {
     'DM & St Erikssimmet (50m) 2023' :
         'DM & St Erikssimmet',
     'Ungdoms-GP 2 (50m) 2022 Eskilstuna' :
-        'UGP 2 2022 med Eskilstuna Sprint'
+        'UGP 2 2022 med Eskilstuna Sprint',
+    'Ungdoms GP 1 (25m) 2023 Härnösand' :
+        'UGP1 2023 med Härnörace, Härnösand',
+    'HärnöRacet 2024' :
+        'HärnöRace 2024',
+    'Norrlandsmästerkapen med Para NM (25m) 2022' :
+        'Norrlandsmästerskapen m Para-NM (25m) 2022'
 }
 
 def hardcoded_name(name: str) -> str:
