@@ -128,13 +128,16 @@ def add_swimmers(heat_content_soup, swimmers: dict, pool: str) -> None:
             swimmer_content_soup = BeautifulSoup(SWIMMER_CONTENT_TEMPLATE, 
                                                 'html.parser')
             
-
-            pool_header = 'Långbana' if curr_pool == '50m' else 'Kortbana'
-            if 'final_time' in best_swim_info[curr_pool]:
-                pool_header += f' ({best_swim_info[curr_pool]["final_time"]})'
-            pool_header += ':'
-            swimmer_content_soup.find('p', 
-                class_='pool-header').string = pool_header
+            if len(info_pool_list) > 1:
+                pool_header = 'Långbana' if curr_pool == '50m' else 'Kortbana'
+                if 'final_time' in best_swim_info[curr_pool]:
+                    pool_header += f' ({best_swim_info[curr_pool]["final_time"]})'
+                pool_header += ':'
+                swimmer_content_soup.find('p', 
+                    class_='pool-header').string = pool_header
+            else:
+                swimmer_content_soup.find('p', 
+                    class_='pool-header').decompose()
 
             links_div = swimmer_content_soup.find('div', 
                                                 class_='swimmer-content-links')
