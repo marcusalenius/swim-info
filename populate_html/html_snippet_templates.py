@@ -59,7 +59,7 @@ SWIMMER_ITEM_TEMPLATE = '''\
 '''
 
 SWIMMER_CONTENT_TEMPLATE = '''\
-<p class="pt14-gray2 pool-header"></p>
+<p class="pt14-gray4 pool-header"></p>
 <div class="swimmer-content-text">
   <div class="swimmer-content-links">
     <a target="_blank"></a>
