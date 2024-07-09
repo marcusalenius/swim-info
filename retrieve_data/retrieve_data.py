@@ -601,11 +601,11 @@ def get_best_swims_for_heat(heat_rows: list, event_name: str, pool: str
                 }
             else:
                 heat_best_swims[f'({lane}, {swimmer_data["name"]})'] = {
-                    pool: other_pool_best_swim,
+                    pool: current_pool_best_swim,
                 }
         else:
             heat_best_swims[f'({lane}, {swimmer_data["name"]})'] = {
-                pool: other_pool_best_swim,
+                pool: current_pool_best_swim,
             }
     return heat_best_swims
 
