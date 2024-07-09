@@ -99,13 +99,13 @@ def add_swimmers(heat_content_soup, swimmers: dict, pool: str) -> None:
         p_swimmer_item_name.string = swimmer_name
         p_swimmer_item_best = swimmer_item_soup.find('p', 
                                                      class_='swimmer-item-best')
-        if 'final_time' in best_swim_info:
-            p_swimmer_item_best.string = best_swim_info['final_time']
-        elif 'first time' in best_swim_info['Error'].lower():
+        if 'final_time' in best_swim_info[pool]:
+            p_swimmer_item_best.string = best_swim_info[pool]['final_time']
+        elif 'first time' in best_swim_info[pool]['Error'].lower():
             p_swimmer_item_best.string = 'Första gången'
         else:
             p_swimmer_item_best.string = 'Error'
-        if 'Error' in best_swim_info:
+        if 'Error' in best_swim_info[pool]:
             p_swimmer_item_lane['class'] = 'swimmer-item-lane pt14-gray4'
             p_swimmer_item_name['class'] = 'swimmer-item-name pt14-gray4'
             p_swimmer_item_best['class'] = 'swimmer-item-best pt14-gray4'
@@ -113,73 +113,99 @@ def add_swimmers(heat_content_soup, swimmers: dict, pool: str) -> None:
         swimmer_container_soup.find('div', class_='swimmer-container').append(
                 swimmer_item_soup)
 
+
         # add swimmer content
-        swimmer_content_soup = BeautifulSoup(SWIMMER_CONTENT_TEMPLATE, 
-                                             'html.parser')
-        
-        links_div = swimmer_content_soup.find('div', 
-                                              class_='swimmer-content-links')
-        a_result = links_div.a
+        swimmer_content_wrapper_soup = BeautifulSoup(
+            '<div class="swimmer-content hidden"></div>', 'html.parser')
 
-        if 'meet_name' in best_swim_info and 'result_url' in best_swim_info:
-            a_result['href'] = best_swim_info['result_url']
-            a_result.string = best_swim_info['meet_name']
-        elif 'meet_name' in best_swim_info:
-            a_result.string = best_swim_info['meet_name']
-            a_result['class'] = 'inactive-link'
-        elif 'result_url' in best_swim_info:
-            a_result['href'] = best_swim_info['result_url']
-            a_result.string = best_swim_info['result_url']
-        else:
-            a_result.decompose()
-        
-        content_text_div = swimmer_content_soup.find(
-            'div', class_='swimmer-content-text')
-        if 'meet_date' in best_swim_info and 'meet_location' in best_swim_info:
-            date = format_date(best_swim_info['meet_date'])
-            content_text_div.p.string = (
-                    f'{best_swim_info["meet_location"]}, {date}')
-        elif 'meet_date' in best_swim_info:
-            date = format_date(best_swim_info['meet_date'])
-            content_text_div.p.string = date
-        elif 'meet_location' in best_swim_info:
-            content_text_div.p.string = (best_swim_info['meet_location'])
-        
-        right_links_div = swimmer_content_soup.find('div', class_='right-links')
-        right_links_a = right_links_div.find_all('a')
-        if ('all_times_url' in best_swim_info and 
-            'all_events_url' in best_swim_info):
-            right_links_a[0]['href'] = best_swim_info['all_times_url']
-            right_links_a[1]['href'] = best_swim_info['all_events_url']
-        elif 'all_times_url' in best_swim_info:
-            right_links_a[0]['href'] = best_swim_info['all_times_url']
-            right_links_a[1].decompose()
-        elif 'all_events_url' in best_swim_info:
-            right_links_a[1]['href'] = best_swim_info['all_events_url']
-            right_links_a[0].decompose()
-        else:
-            right_links_div.decompose()
+        info_pool_list = list(best_swim_info.items())
+        if info_pool_list[0][0] != pool:
+            # swap spots
+            (info_pool_list[0], info_pool_list[1]) = (info_pool_list[1], 
+                                                      info_pool_list[0])
+        for curr_pool, best_swim_info_specific_pool in info_pool_list:
 
-        
-        
-        if 'avg50' in best_swim_info:
-            if best_swim_info['avg50'] is not None:
-                swimmer_content_soup.find('p', class_='avg50-time').string = (
-                    best_swim_info['avg50'])
+            swimmer_content_soup = BeautifulSoup(SWIMMER_CONTENT_TEMPLATE, 
+                                                'html.parser')
+            
+            swimmer_content_soup.find('p', 
+                class_='pool-header').string = f'{curr_pool}:'
+
+            links_div = swimmer_content_soup.find('div', 
+                                                class_='swimmer-content-links')
+            a_result = links_div.a
+
+            if ('meet_name' in best_swim_info_specific_pool and 
+                'result_url' in best_swim_info_specific_pool):
+                a_result['href'] = best_swim_info_specific_pool['result_url']
+                a_result.string = best_swim_info_specific_pool['meet_name']
+            elif 'meet_name' in best_swim_info_specific_pool:
+                a_result.string = best_swim_info_specific_pool['meet_name']
+                a_result['class'] = 'inactive-link'
+            elif 'result_url' in best_swim_info_specific_pool:
+                a_result['href'] = best_swim_info_specific_pool['result_url']
+                a_result.string = best_swim_info_specific_pool['result_url']
+            else:
+                a_result.decompose()
+            
+            content_text_div = swimmer_content_soup.find(
+                'div', class_='swimmer-content-text')
+            if ('meet_date' in best_swim_info_specific_pool and 
+                'meet_location' in best_swim_info_specific_pool):
+                date = format_date(best_swim_info_specific_pool['meet_date'])
+                content_text_div.p.string = (
+                    f'{best_swim_info_specific_pool["meet_location"]}, {date}')
+            elif 'meet_date' in best_swim_info_specific_pool:
+                date = format_date(best_swim_info_specific_pool['meet_date'])
+                content_text_div.p.string = date
+            elif 'meet_location' in best_swim_info_specific_pool:
+                content_text_div.p.string = (
+                    best_swim_info_specific_pool['meet_location'])
+            
+            right_links_div = swimmer_content_soup.find('div', 
+                                                        class_='right-links')
+            right_links_a = right_links_div.find_all('a')
+            if ('all_times_url' in best_swim_info_specific_pool and 
+                'all_events_url' in best_swim_info_specific_pool):
+                right_links_a[0]['href'] = best_swim_info_specific_pool[
+                    'all_times_url']
+                right_links_a[1]['href'] = best_swim_info_specific_pool[
+                    'all_events_url']
+            elif 'all_times_url' in best_swim_info_specific_pool:
+                right_links_a[0]['href'] = best_swim_info_specific_pool[
+                    'all_times_url']
+                right_links_a[1].decompose()
+            elif 'all_events_url' in best_swim_info_specific_pool:
+                right_links_a[1]['href'] = best_swim_info_specific_pool[
+                    'all_events_url']
+                right_links_a[0].decompose()
+            else:
+                right_links_div.decompose()
+
+            if 'avg50' in best_swim_info_specific_pool:
+                if best_swim_info_specific_pool['avg50'] is not None:
+                    swimmer_content_soup.find('p', 
+                        class_='avg50-time').string = (
+                            best_swim_info_specific_pool['avg50'])
+                else:
+                    swimmer_content_soup.find('div', 
+                        class_='swimmer-content-avg50').decompose()
             else:
                 swimmer_content_soup.find('div', class_='swimmer-content-avg50'
-                                          ).decompose()
-        else:
-            swimmer_content_soup.find('div', class_='swimmer-content-avg50'
-                                      ).decompose()
-                
-        if 'splits' in best_swim_info:
-            add_splits(swimmer_content_soup, best_swim_info['splits'])
-        else:
-            add_error_message(swimmer_content_soup, best_swim_info)
+                                        ).decompose()
+                    
+            if 'splits' in best_swim_info_specific_pool:
+                add_splits(swimmer_content_soup, 
+                           best_swim_info_specific_pool['splits'])
+            else:
+                add_error_message(swimmer_content_soup, 
+                                  best_swim_info_specific_pool)
+            
+            swimmer_content_wrapper_soup.find('div').append(
+                swimmer_content_soup)
 
         swimmer_container_soup.find('div', class_='swimmer-container').append(
-                swimmer_content_soup)
+                swimmer_content_wrapper_soup)
 
         # add to heat content
         heat_content_soup.find('div', class_='swimmer-list').append(
