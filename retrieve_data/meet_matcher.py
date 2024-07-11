@@ -48,7 +48,22 @@ HARDCODED_NAMES = {
     'HärnöRacet 2024' :
         'HärnöRace 2024',
     'Norrlandsmästerkapen med Para NM (25m) 2022' :
-        'Norrlandsmästerskapen m Para-NM (25m) 2022'
+        'Norrlandsmästerskapen m Para-NM (25m) 2022',
+    'Södertörns Simsällskap KM 2022' :
+        'Södertörns Simsällskap KM 2022, Torvalla simhall',
+    'Arena & Poseidon Team Cup (PTC) 2023' :
+        'Arena & Poseidon Team Cup [PTC]',
+    'Öresund Meeting 2024' : 
+        'Öresund Meeting & Öresund Sprint Challenge 2024',
+    'UDM 13-14 år 2024 Halmstad' :
+        'UDM 13-14 2024 Halmstad',
+    'Seriesim deltävling 2, 2024' :
+        'Seriesim 2 2024',
+    'Senior-DM, Junior-DM och Parasim-DM (25m) 2023' :
+        'Senior-DM, Junior-DM, Parasim-DM 2023',
+    'Zoggs Zwim Stockholm - Summer Cup 2024' : 
+        'Zoggs Zwim Summer Cup 2024',
+    
 }
 
 def hardcoded_name(name: str) -> str:
