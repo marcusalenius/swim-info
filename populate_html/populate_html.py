@@ -38,7 +38,12 @@ def add_splits(swimmer_content_soup, splits: dict) -> None:
     for split_index in range(0, len(splits_list), 2):
         split_row_soup = BeautifulSoup(SPLIT_ROW_TEMPLATE, 'html.parser')
         for col_index in range(2):
-            splits = splits_list[split_index + col_index]
+            try:
+                splits = splits_list[split_index + col_index]
+            except IndexError:
+                print('Error in add_splits')
+                print(splits_list, split_index, col_index)
+                # input('STOPPED')
             distance = f'{str(splits[0])}m:'
             time = splits[1]
             time_tokens = time.split(' ')
